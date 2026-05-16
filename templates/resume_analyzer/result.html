@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="width:80%; margin:auto; font-family:Arial;">
+
+    <h1>Resume Analysis Result</h1>
+
+    {% if error %}
+        <div style="background:#ffdddd; padding:15px; border-radius:10px;">
+            <p>{{ error }}</p>
+        </div>
+    {% else %}
+
+        <div style="background:#f5f5f5; padding:20px; border-radius:10px; margin-top:20px;">
+
+            <h2>Detected Domain: {{ domain }}</h2>
+
+            <h3>ATS Score: {{ ats_score }}/100</h3>
+
+            <hr>
+
+            <h3>Extracted Skills</h3>
+
+            <ul>
+                {% for skill in skills %}
+                    <li>{{ skill }}</li>
+                {% empty %}
+                    <li>No skills detected</li>
+                {% endfor %}
+            </ul>
+
+            <hr>
+
+            <h3>Missing Skills</h3>
+
+            <ul>
+                {% for skill in missing_skills %}
+                    <li>{{ skill }}</li>
+                {% empty %}
+                    <li>No missing skills</li>
+                {% endfor %}
+            </ul>
+
+            <hr>
+
+            <h3>Suggestions</h3>
+
+            {% if suggestions %}
+                <ul>
+                    {% for s in suggestions %}
+                        <li>{{ s }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div style="background:#ddffdd; padding:15px; border-radius:10px;">
+                    Your resume looks strong for {{ domain }} roles.
+                </div>
+            {% endif %}
+
+            <br>
+
+            <a href="/dashboard/"
+               style="padding:10px 20px;
+               background:black;
+               color:white;
+               text-decoration:none;
+               border-radius:5px;">
+               Go to Dashboard
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Job Matches</h2>
+
+{% if error %}
+    <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+{% for item in results %}
+    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        <h3>{{ item.job.title }}</h3>
+        <p><strong>Company:</strong> {{ item.job.company }}</p>
+        <p><strong>Match Score:</strong> {{ item.score }}%</p>
+        <p><strong>Status:</strong> {{ item.match_type }}</p>
+    </div>
+{% endfor %}
+
+<a href="/dashboard/">Back</a>
+
+{% endblock %}
