@@ -4,8 +4,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 
-from google.auth.transport.requests import Request
-from google.auth.exceptions import RefreshError
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
@@ -13,6 +11,10 @@ from job_matcher.models import Job, MatchResult
 from users.services.match_engine import MatchEngine
 from .forms import RegisterForm
 
+
+# ---------------------------------------------------
+# REGISTER
+# ---------------------------------------------------
 def register(request):
 
     if request.method == 'POST':
@@ -37,10 +39,18 @@ def register(request):
         {'form': form}
     )
 
+
+# ---------------------------------------------------
+# HOME
+# ---------------------------------------------------
 def home(request):
 
     return redirect('/resume/upload/')
 
+
+# ---------------------------------------------------
+# DOMAIN BASED GMAIL SEARCH
+# ---------------------------------------------------
 QUERY_MAP = {
 
     "web_development":
@@ -56,6 +66,10 @@ QUERY_MAP = {
         "machine learning OR ai engineer OR data scientist OR deep learning OR nlp"
 }
 
+
+# ---------------------------------------------------
+# MATCH LEVEL
+# ---------------------------------------------------
 def get_match_level(score):
 
     if score >= 70:
@@ -66,10 +80,16 @@ def get_match_level(score):
 
     return "Low"
 
+
+# ---------------------------------------------------
+# DASHBOARD
+# ---------------------------------------------------
 @login_required
 def dashboard(request):
 
-    
+    # ---------------------------------------------------
+    # CHECK RESUME
+    # ---------------------------------------------------
     if 'resume_text' not in request.session:
 
         return redirect('/resume/upload/')
@@ -110,351 +130,348 @@ def dashboard(request):
 
     gmail_connected = False
 
-    
+    # ---------------------------------------------------
+    # GMAIL
+    # ---------------------------------------------------
     if 'credentials' in request.session:
 
-        try:
+        gmail_connected = True
 
-            creds = Credentials(
-                **request.session['credentials']
-            )
+        creds = Credentials(
+            **request.session['credentials']
+        )
 
-            
-            if creds.expired and creds.refresh_token:
+        service = build(
+            'gmail',
+            'v1',
+            credentials=creds
+        )
 
-                creds.refresh(Request())
+        # ---------------------------------------------------
+        # SEARCH QUERY
+        # ---------------------------------------------------
+        query = QUERY_MAP.get(
+            domain,
+            "job OR hiring"
+        )
 
-                
-                request.session['credentials'] = {
+        results = service.users().messages().list(
+            userId='me',
+            q=query,
+            maxResults=30
+        ).execute()
 
-                    'token': creds.token,
+        messages = results.get(
+            'messages',
+            []
+        )
 
-                    'refresh_token': creds.refresh_token,
+        # ---------------------------------------------------
+        # AI MATCH ENGINE
+        # ---------------------------------------------------
+        engine = MatchEngine(
+            resume_text,
+            skills,
+            domain
+        )
 
-                    'token_uri': creds.token_uri,
+        # ---------------------------------------------------
+        # PROCESS EMAILS
+        # ---------------------------------------------------
+        for msg in messages:
 
-                    'client_id': creds.client_id,
+            try:
 
-                    'client_secret': creds.client_secret,
+                msg_data = service.users().messages().get(
+                    userId='me',
+                    id=msg['id'],
+                    format='full'
+                ).execute()
 
-                    'scopes': creds.scopes
-                }
+                headers = msg_data['payload'].get(
+                    'headers',
+                    []
+                )
 
-            gmail_connected = True
+                subject = ""
+                sender = ""
 
-            service = build(
-                'gmail',
-                'v1',
-                credentials=creds
-            )
+                for h in headers:
 
-            
-            query = QUERY_MAP.get(
-                domain,
-                "job OR hiring"
-            )
+                    name = h.get(
+                        'name',
+                        ''
+                    ).lower()
 
-            results = service.users().messages().list(
-                userId='me',
-                q=query,
-                maxResults=30
-            ).execute()
+                    if name == 'subject':
 
-            messages = results.get(
-                'messages',
-                []
-            )
+                        subject = h.get(
+                            'value',
+                            ''
+                        )
 
-        
-            engine = MatchEngine(
-                resume_text,
-                skills,
-                domain
-            )
+                    if name == 'from':
 
-            # ---------------------------------------------------
-            # PROCESS EMAILS
-            # ---------------------------------------------------
-            for msg in messages:
+                        sender = h.get(
+                            'value',
+                            ''
+                        )
+
+                # ---------------------------------------------------
+                # GMAIL SNIPPET
+                # ---------------------------------------------------
+                snippet = msg_data.get(
+                    'snippet',
+                    ''
+                )
+
+                # ---------------------------------------------------
+                # EXTRACT FULL EMAIL BODY
+                # ---------------------------------------------------
+                body = ""
+
+                payload = msg_data.get(
+                    "payload",
+                    {}
+                )
+
+                parts = payload.get(
+                    "parts",
+                    []
+                )
 
                 try:
 
-                    msg_data = service.users().messages().get(
-                        userId='me',
-                        id=msg['id'],
-                        format='full'
-                    ).execute()
+                    if parts:
 
-                    headers = msg_data['payload'].get(
-                        'headers',
-                        []
-                    )
+                        for part in parts:
 
-                    subject = ""
-                    sender = ""
-
-                    for h in headers:
-
-                        name = h.get(
-                            'name',
-                            ''
-                        ).lower()
-
-                        if name == 'subject':
-
-                            subject = h.get(
-                                'value',
-                                ''
+                            mime_type = part.get(
+                                "mimeType",
+                                ""
                             )
 
-                        if name == 'from':
+                            if mime_type == "text/plain":
 
-                            sender = h.get(
-                                'value',
-                                ''
-                            )
-
-                    
-                    snippet = msg_data.get(
-                        'snippet',
-                        ''
-                    )
-
-            
-                    body = ""
-
-                    payload = msg_data.get(
-                        "payload",
-                        {}
-                    )
-
-                    parts = payload.get(
-                        "parts",
-                        []
-                    )
-
-                    try:
-
-                        if parts:
-
-                            for part in parts:
-
-                                mime_type = part.get(
-                                    "mimeType",
-                                    ""
+                                data = part.get(
+                                    "body",
+                                    {}
+                                ).get(
+                                    "data"
                                 )
 
-                                if mime_type == "text/plain":
+                                if data:
 
-                                    data = part.get(
-                                        "body",
-                                        {}
-                                    ).get(
-                                        "data"
+                                    decoded = base64.urlsafe_b64decode(
+                                        data
+                                    ).decode(
+                                        "utf-8",
+                                        errors="ignore"
                                     )
 
-                                    if data:
-
-                                        decoded = base64.urlsafe_b64decode(
-                                            data
-                                        ).decode(
-                                            "utf-8",
-                                            errors="ignore"
-                                        )
-
-                                        body += decoded
-
-                        else:
-
-                            data = payload.get(
-                                "body",
-                                {}
-                            ).get(
-                                "data"
-                            )
-
-                            if data:
-
-                                decoded = base64.urlsafe_b64decode(
-                                    data
-                                ).decode(
-                                    "utf-8",
-                                    errors="ignore"
-                                )
-
-                                body += decoded
-
-                    except Exception as e:
-
-                        print("BODY PARSE ERROR:", e)
-
-            
-                    text_blob = f"""
-                    {subject}
-
-                    {snippet}
-
-                    {body}
-                    """
-
-                    text_blob_lower = text_blob.lower()
-
-                    valid_keywords = [
-
-                        "job",
-                        "developer",
-                        "engineer",
-                        "analyst",
-                        "intern",
-                        "hiring",
-                        "career",
-                        "vacancy",
-
-                        "machine learning",
-                        "ai",
-                        "deep learning",
-                        "data science",
-                        "nlp",
-                        "computer vision",
-
-                        "python",
-                        "tensorflow",
-                        "pytorch",
-                        "sql",
-                        "pandas"
-                    ]
-
-                    if not any(
-                        keyword in text_blob_lower
-                        for keyword in valid_keywords
-                    ):
-                        continue
-
-                
-                    role = subject.strip()
-
-                    company = "Unknown"
-
-                    if " at " in subject.lower():
-
-                        parts = subject.split(" at ")
-
-                        role = parts[0].strip()
-
-                        company = parts[1].strip()
-
-            
-                    key = f"{role}_{company}"
-
-                    if key in seen:
-                        continue
-
-                    seen.add(key)
-
-                    # ---------------------------------------------------
-                    # AI SCORE
-                    # ---------------------------------------------------
-                    match_score, matched_skills = engine.compute_score(
-                        text_blob
-                    )
-
-                    # ---------------------------------------------------
-                    # FILTER VERY LOW SCORES
-                    # ---------------------------------------------------
-                    if match_score < 15:
-                        continue
-
-                    match_level = get_match_level(
-                        match_score
-                    )
-
-                    # ---------------------------------------------------
-                    # SAVE JOB
-                    # ---------------------------------------------------
-                    job_obj, created = Job.objects.get_or_create(
-
-                        title=role,
-
-                        company=company,
-
-                        defaults={
-                            'description': snippet
-                        }
-                    )
-
-            
-                    match_obj = MatchResult.objects.filter(
-                        user=request.user,
-                        job=job_obj
-                    ).first()
-
-                    if match_obj:
-
-                        match_obj.score = match_score
-
-                        match_obj.match_type = match_level
-
-                        match_obj.save()
+                                    body += decoded
 
                     else:
 
-                        MatchResult.objects.create(
-                            user=request.user,
-                            job=job_obj,
-                            score=match_score,
-                            match_type=match_level
+                        data = payload.get(
+                            "body",
+                            {}
+                        ).get(
+                            "data"
                         )
 
-                    
-                    jobs.append({
+                        if data:
 
-                        "subject": role,
+                            decoded = base64.urlsafe_b64decode(
+                                data
+                            ).decode(
+                                "utf-8",
+                                errors="ignore"
+                            )
 
-                        "company": company,
-
-                        "sender": sender,
-
-                        "match_score": match_score,
-
-                        "match_level": match_level,
-
-                        "matched_skills": matched_skills[:6]
-                    })
+                            body += decoded
 
                 except Exception as e:
 
-                    print("EMAIL ERROR:", e)
+                    print("BODY PARSE ERROR:", e)
 
+                # ---------------------------------------------------
+                # COMPLETE EMAIL TEXT
+                # ---------------------------------------------------
+                text_blob = f"""
+                {subject}
+
+                {snippet}
+
+                {body}
+                """
+
+                text_blob_lower = text_blob.lower()
+
+                # ---------------------------------------------------
+                # SMART JOB FILTER
+                # ---------------------------------------------------
+                valid_keywords = [
+
+                    "job",
+                    "developer",
+                    "engineer",
+                    "analyst",
+                    "intern",
+                    "hiring",
+                    "career",
+                    "vacancy",
+
+                    "machine learning",
+                    "ai",
+                    "deep learning",
+                    "data science",
+                    "nlp",
+                    "computer vision",
+                    "artificial intelligence",
+
+                    "python",
+                    "tensorflow",
+                    "pytorch",
+                    "sql",
+                    "pandas"
+                ]
+
+                if not any(
+                    keyword in text_blob_lower
+                    for keyword in valid_keywords
+                ):
                     continue
 
-        except RefreshError:
+                # ---------------------------------------------------
+                # EXTRACT ROLE + COMPANY
+                # ---------------------------------------------------
+                role = subject.strip()
 
-            print("TOKEN EXPIRED")
+                company = "Unknown"
 
-            if 'credentials' in request.session:
-                del request.session['credentials']
+                if " at " in subject.lower():
 
-            return redirect('/gmail/connect/')
+                    parts = subject.split(" at ")
 
-        except Exception as e:
+                    role = parts[0].strip()
 
-            print("GMAIL AUTH ERROR:", e)
+                    company = parts[1].strip()
 
-            gmail_connected = False
+                # ---------------------------------------------------
+                # REMOVE DUPLICATES
+                # ---------------------------------------------------
+                key = f"{role}_{company}"
 
-    
+                if key in seen:
+                    continue
+
+                seen.add(key)
+
+                # ---------------------------------------------------
+                # AI SCORE
+                # ---------------------------------------------------
+                match_score, matched_skills = engine.compute_score(
+                    text_blob
+                )
+
+                # ---------------------------------------------------
+                # FILTER VERY LOW SCORES
+                # ---------------------------------------------------
+                if match_score < 15:
+                    continue
+
+                match_level = get_match_level(
+                    match_score
+                )
+
+                # ---------------------------------------------------
+                # SAVE JOB
+                # ---------------------------------------------------
+                job_obj, created = Job.objects.get_or_create(
+
+                    title=role,
+
+                    company=company,
+
+                    defaults={
+                        'description': snippet
+                    }
+                )
+
+                # ---------------------------------------------------
+                # SAVE MATCH HISTORY
+                # ---------------------------------------------------
+                match_obj = MatchResult.objects.filter(
+                    user=request.user,
+                    job=job_obj
+                ).first()
+
+                if match_obj:
+
+                    match_obj.score = match_score
+
+                    match_obj.match_type = match_level
+
+                    match_obj.save()
+
+                else:
+
+                    MatchResult.objects.create(
+                        user=request.user,
+                        job=job_obj,
+                        score=match_score,
+                        match_type=match_level
+                    )
+
+                # ---------------------------------------------------
+                # DASHBOARD JOBS
+                # ---------------------------------------------------
+                jobs.append({
+
+                    "subject": role,
+
+                    "company": company,
+
+                    "sender": sender,
+
+                    "match_score": match_score,
+
+                    "match_level": match_level,
+
+                    "matched_skills": matched_skills[:6]
+                })
+
+            except Exception as e:
+
+                print("EMAIL ERROR:", e)
+
+                continue
+
+    # ---------------------------------------------------
+    # MATCH HISTORY
+    # ---------------------------------------------------
     previous_matches = MatchResult.objects.filter(
         user=request.user
     ).order_by('-id')[:15]
 
+    # ---------------------------------------------------
+    # SORT JOBS
+    # ---------------------------------------------------
     jobs = sorted(
         jobs,
         key=lambda x: x["match_score"],
         reverse=True
     )
 
+    # ---------------------------------------------------
+    # SHOW ONLY TOP JOB MATCHES
+    # ---------------------------------------------------
     jobs = jobs[:6]
-    
+
+    # ---------------------------------------------------
+    # FINAL PAGE
+    # ---------------------------------------------------
     return render(request, "users/dashboard.html", {
 
         "domain": domain,
