@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-
 from resume_analyzer.models import Resume
 from .models import Job
 
@@ -20,7 +19,6 @@ def simple_skill_match(resume_skills, job_description):
     score = (matched / len(resume_skills)) * 100
     return round(score, 2)
 
-
 def classify_match(score):
     if score >= 70:
         return "High Match"
@@ -28,7 +26,6 @@ def classify_match(score):
         return "Medium Match"
     else:
         return "Low Match"
-
 
 @login_required
 def match_jobs(request):
@@ -46,7 +43,6 @@ def match_jobs(request):
         for job in jobs:
             score = simple_skill_match(resume.skills, job.description)
             match_type = classify_match(score)
-
             results.append({
                 'job': job,
                 'score': score,

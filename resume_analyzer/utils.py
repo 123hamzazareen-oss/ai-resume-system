@@ -1,13 +1,11 @@
 import fitz
 import docx
-
 SKILL_CATEGORIES = {
     "web_development": ["html", "css", "javascript", "bootstrap", "react", "django"],
     "python_development": ["python", "django", "flask", "api", "backend"],
     "machine_learning": ["python", "machine learning", "deep learning", "tensorflow", "pytorch", "nlp"],
     "data_analyst": ["python", "sql", "data analysis", "pandas", "excel", "power bi"]
 }
-
 
 def extract_text_from_pdf(path):
     text = ""
@@ -16,11 +14,9 @@ def extract_text_from_pdf(path):
         text += page.get_text()
     return text
 
-
 def extract_text_from_docx(path):
     doc = docx.Document(path)
     return "\n".join([p.text for p in doc.paragraphs])
-
 
 def extract_text(path):
     if path.endswith(".pdf"):
@@ -29,11 +25,9 @@ def extract_text(path):
         return extract_text_from_docx(path)
     return ""
 
-
 def extract_skills(text):
     text = text.lower()
     skills = []
-
     all_skills = []
     for v in SKILL_CATEGORIES.values():
         all_skills.extend(v)
@@ -43,7 +37,6 @@ def extract_skills(text):
             skills.append(skill)
 
     return list(set(skills))
-
 
 def detect_domain(skills):
     scores = {}
@@ -56,7 +49,6 @@ def detect_domain(skills):
 
     return max(scores, key=scores.get)
 
-
 def calculate_ats_score(skills, domain):
     if domain == "general":
         return 0
@@ -64,16 +56,13 @@ def calculate_ats_score(skills, domain):
     domain_skills = SKILL_CATEGORIES[domain]
     return int((len(set(skills) & set(domain_skills)) / len(domain_skills)) * 100)
 
-
 def get_missing_skills(found, domain):
     if domain == "general":
         return []
 
     return list(set(SKILL_CATEGORIES[domain]) - set(found))
 
-
 def generate_suggestions(skills, missing, domain, ats):
-
     suggestions = []
 
     if ats >= 80:

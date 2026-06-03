@@ -1,408 +1,176 @@
-# AI Resume Analyzer and Smart Job Matching System with Gmail Integration
+# ✦ AI Resume Analyzer & Smart Job Matcher
 
-AI Resume Analyzer and Smart Job Matching System is a Django-based intelligent web application that helps users analyze resumes, calculate ATS scores, and discover suitable job opportunities automatically using AI and NLP techniques.
-
-The system also integrates with Gmail using OAuth 2.0 to fetch job-related emails and compare them with the uploaded resume for smart job matching.
+An intelligent, Django-powered web platform designed to analyze professional resumes, calculate compatibility scores, and automate career discovery by scanning email inboxes.
 
 ---
 
-# Features
+## 🚀 Key Features
 
-- User Registration and Authentication
-- Resume Upload (PDF and DOCX)
-- Resume Text Extraction
-- Skill Detection
-- Domain Detection
-- ATS Score Calculation
-- Missing Skills Identification
-- Resume Improvement Suggestions
-- AI-Based Job Matching
-- Gmail Job Email Fetching
-- Smart Match Classification
-- Interactive Dashboard
-- Match History Tracking
+*   **Intelligent Resume Parsing:** Automatically extracts text, identifies professional skills, and detects domains from PDF and Word (`.docx`) documents.
+*   **Real-Time Score Engine:** Computes compatibility scores out of 100 based on standard industry taxonomies.
+*   **Gmail Integration (OAuth 2.0):** Securely scans your Gmail inbox (read-only) for career-related emails.
+*   **AI-Powered Similarity Matching:** Utilizes **TF-IDF Vectorization** and **Cosine Similarity** to compare resume content with fetched email bodies and list matching jobs.
+*   **Interactive Dashboard:** Displays resume insights, missing skills, suggestions, and a live history of job matches with compatibility ratings (High, Medium, Low).
 
 ---
 
-# Technologies Used
+## 🛠️ Technology Stack
 
-## Backend
-- Python
-- Django
-
-## Frontend
-- HTML
-- CSS
-- Bootstrap 5
-
-## Database
-- PostgreSQL
-
-## AI / NLP
-- Scikit-learn
-- TF-IDF Vectorizer
-- Cosine Similarity
-
-## APIs
-- Gmail API
-- Google OAuth 2.0
-
-## Libraries
-- PyMuPDF (fitz)
-- python-docx
-- google-api-python-client
-- google-auth-oauthlib
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Backend** | Python / Django | Robust, secure web frame for application logic. |
+| **Database** | PostgreSQL | Scalable relational database for user data and match history. |
+| **Parsing** | PyMuPDF (fitz) / Python-Docx | High-performance document processors for PDF and DOCX. |
+| **AI / NLP** | Scikit-Learn | TF-IDF & Cosine Similarity vector matching engine. |
+| **API / Auth** | Google OAuth2 / Gmail API | Official Google API client for inbox scanning. |
+| **Configuration** | Python-Dotenv | Safe management of credentials via `.env` file. |
 
 ---
 
-# Project Workflow
+## 📈 System Architecture & Flow
 
 ```text
-User Uploads Resume
-        ↓
-Resume Text Extraction
-        ↓
-Skill Extraction
-        ↓
-Domain Detection
-        ↓
-ATS Score Calculation
-        ↓
-Resume Suggestions
-        ↓
-Gmail Job Fetching
-        ↓
-AI Job Matching
-        ↓
-Dashboard Results
+       [ User Uploads Resume ]
+                 │
+                 ▼
+     [ Text & Skill Extraction ]
+                 │
+                 ▼
+    [ Detect Career Track/Domain ]
+                 │
+                 ▼
+   [ Connect Gmail via Google OAuth ]
+                 │
+                 ▼
+   [ Scan Inbox for Career Emails ]
+                 │
+                 ▼
+  [ Compute Cosine Similarity Matching ]
+                 │
+                 ▼
+ [ View Matched Jobs on User Dashboard ]
 ```
 
 ---
 
-# System Modules
-
-## 1. Resume Analyzer Module
-
-This module handles:
-- Resume upload
-- PDF/DOCX parsing
-- Text extraction
-- Skill extraction
-- ATS score generation
-- Missing skills detection
-- Suggestions generation
-
-Supported formats:
-- PDF
-- DOCX
-
----
-
-## 2. Job Matching Module
-
-This module compares:
-- Resume skills
-- Resume text
-- Job descriptions
-
-The matching engine uses:
-- TF-IDF
-- Cosine Similarity
-- Skill matching
-- Domain-based scoring
-- Role bonus scoring
-
-Jobs are classified into:
-- High Match
-- Medium Match
-- Low Match
-
----
-
-## 3. Gmail Integration Module
-
-This module:
-- Connects Gmail using OAuth 2.0
-- Fetches job-related emails
-- Extracts:
-  - Job title
-  - Company name
-  - Sender information
-- Filters hiring emails
-- Matches jobs with user resume
-
----
-
-## 4. Dashboard Module
-
-The dashboard displays:
-- ATS score
-- Skills
-- Missing skills
-- Suggestions
-- Live job matches
-- Match percentage
-- Previous match history
-
----
-
-# AI Matching Logic
-
-The project uses hybrid matching logic.
-
-## TF-IDF Similarity
-TF-IDF is used to compare resume text with job descriptions.
-
-## Cosine Similarity
-Cosine Similarity calculates similarity scores between:
-- Resume content
-- Job requirement text
-
-## Skill Matching
-The system checks how many resume skills exist in the job description.
-
-## Domain Boost
-Extra score is added when the job belongs to the detected user domain.
-
-## Role Bonus
-Additional score is added for important roles like:
-- Python Developer
-- Data Analyst
-- Machine Learning Engineer
-- Backend Developer
-
----
-
-# ATS Score Calculation
-
-ATS score is calculated based on:
-- Skills found in the resume
-- Matching domain skills
-- Resume keyword optimization
-
-The final score is generated out of 100.
-
----
-
-# Supported Domains
-
-- Web Development
-- Python Development
-- Machine Learning
-- Data Analyst
-
----
-
-# Project Structure
+## 📦 Project Directory Structure
 
 ```bash
 ai_resume_system/
-│
-├── users/
-├── resume_analyzer/
-├── job_matcher/
-├── gmail_integration/
-├── templates/
-├── static/
-├── media/
-├── manage.py
-└── requirements.txt
+├── ai_resume_system/      # Django settings and routing config
+├── users/                 # Authentication backend and dashboard views
+├── resume_analyzer/       # PDF/Word text parsing and skill extractor
+├── job_matcher/           # Database models for jobs and match results
+├── gmail_integration/     # OAuth 2.0 Gmail scanning logic
+├── templates/             # HTML templates and UI layout
+├── static/                # CSS styles, images, and static assets
+├── .env                   # Local configuration variables (ignored in Git)
+├── credentials.json       # Google Console OAuth credentials
+├── manage.py              # Django execution manager
+└── requirements.txt       # Python package dependencies
 ```
 
 ---
 
-# Installation Guide
+## ⚙️ Installation & Setup
 
-## 1. Clone Repository
+Follow these steps to run the application locally on your machine.
 
+### Prerequisites
+*   Python 3.8+
+*   PostgreSQL
+*   Google Cloud Console access (for Gmail API integration)
+
+---
+
+### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/your-username/your-repository-name.git
-cd your-repository-name
+git clone https://github.com/your-username/ai-resume-system.git
+cd ai-resume-system
 ```
 
 ---
 
-## 2. Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-### Activate Environment
+### Step 2: Set Up Virtual Environment
 
 #### Windows
-
-```bash
+```powershell
+python -m venv venv
 venv\Scripts\activate
 ```
 
-#### Linux / Mac
-
+#### Linux / macOS
 ```bash
+python3 -m venv venv
 source venv/bin/activate
 ```
 
 ---
 
-## 3. Install Requirements
-
+### Step 3: Install Required Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-# Required Packages
+### Step 4: Configure Environment Variables (`.env`)
+Create a `.env` file in the root directory and add the following settings:
 
-```bash
-pip install django
-pip install psycopg2
-pip install pymupdf
-pip install python-docx
-pip install scikit-learn
-pip install google-api-python-client
-pip install google-auth-oauthlib
+```env
+# Django Configurations
+SECRET_KEY=your-django-secret-key
+DEBUG=True
+
+# PostgreSQL Database Settings
+DB_NAME=Resume_Analyzer
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
 ---
 
-# PostgreSQL Setup
-
-Create database:
-
+### Step 5: Initialize the PostgreSQL Database
+Create a PostgreSQL database matching the name in your `.env` file:
 ```sql
 CREATE DATABASE Resume_Analyzer;
 ```
 
-Update database settings inside:
+---
 
-```python
-ai_resume_system/settings.py
-```
-
-Example:
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Resume_Analyzer',
-        'USER': 'postgres',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
+### Step 6: Google OAuth & Gmail API Setup
+1.  Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2.  Create a new project and enable the **Gmail API**.
+3.  Set up the OAuth consent screen and create **OAuth 2.0 Client IDs** credentials (Web Application type).
+4.  Add `http://127.0.0.1:8000/gmail/callback/` to your Authorized Redirect URIs.
+5.  Download the client configuration JSON file and rename it to **`credentials.json`**.
+6.  Place **`credentials.json`** directly inside the root folder of the project.
 
 ---
 
-# Gmail API Setup
-
-## Step 1
-Open Google Cloud Console
-
-## Step 2
-Create a new project
-
-## Step 3
-Enable Gmail API
-
-## Step 4
-Create OAuth Credentials
-
-## Step 5
-Download:
-
-```text
-credentials.json
-```
-
-Place the file in the project root directory.
-
----
-
-# Run Database Migrations
-
+### Step 7: Run Migrations & Start Server
+Apply database migrations to configure PostgreSQL tables:
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
----
-
-# Create Superuser
-
+Create an admin account:
 ```bash
 python manage.py createsuperuser
 ```
 
----
-
-# Run the Project
-
+Launch the development server:
 ```bash
 python manage.py runserver
 ```
-
-Open browser:
-
-```text
-http://127.0.0.1:8000/
-```
+Visit the application at: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ---
 
-# Example Features
+## 🔒 Security & Privacy Notes
 
-## Resume Analysis
-- Resume ATS Score
-- Skill Detection
-- Missing Skills
-- Resume Suggestions
-
-## Job Matching
-- Match Percentage
-- High/Medium/Low Match
-- Skill Comparison
-
-## Gmail Integration
-- Job Email Fetching
-- Hiring Email Detection
-- Smart Job Matching
-
----
-
-# Security Features
-
-- Django Authentication System
-- Gmail OAuth 2.0 Authentication
-
-
----
-
-# Future Improvements
-- AI Career Chatbot
-- Resume PDF Reports
-- Advanced NLP Models
-- Interview Preparation System
-- Admin Analytics Dashboard
-
----
-
-# Contributors
-
-- Hamza Zareen
-- Muhammad Uzair
-
----
-
-# License
-
-This project is developed for educational and Final Year Project purposes.
-
----
-
-# Conclusion
-
-AI Resume Analyzer and Smart Job Matching System with Gmail Integration is an intelligent web platform that helps students and job seekers improve resumes, calculate ATS compatibility, and discover suitable job opportunities automatically using NLP and AI-based matching techniques.
+*   **Google OAuth 2.0 Consent:** The Gmail connection requests **read-only** inbox scopes. The application does not have permission to send, edit, or delete messages.
+*   **Secure Environment Settings:** Database passwords and Django secret keys are protected outside the source code using the local `.env` configuration file.

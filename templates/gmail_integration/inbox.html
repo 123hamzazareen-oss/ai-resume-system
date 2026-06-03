@@ -3,18 +3,12 @@
 {% block content %}
 
 <h2>Job Emails</h2>
-
 {% for email in emails %}
     <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-
         <p><strong>From:</strong> {{ email.sender }}</p>
-
         <p><strong>Subject:</strong> {{ email.subject }}</p>
-
         <p><strong>Company:</strong> {{ email.company }}</p>
-
         <p><strong>Match Score:</strong> {{ email.match_score }}%</p>
-
         {% if email.match_level == "High Match" %}
             <p style="color:green;"><strong> High Match</strong></p>
         {% elif email.match_level == "Medium Match" %}
@@ -28,10 +22,8 @@
         {% else %}
             <p style="color:red;">Not Job</p>
         {% endif %}
-
     </div>
 {% empty %}
     <p>No job emails found.</p>
 {% endfor %}
-
 {% endblock %}

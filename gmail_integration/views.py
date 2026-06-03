@@ -7,8 +7,6 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from django.contrib.auth.decorators import login_required
 from .models import JobEmail
-
-
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 @login_required
@@ -18,13 +16,11 @@ def connect_gmail(request):
         scopes=SCOPES,
         redirect_uri=settings.GOOGLE_REDIRECT_URI
     )
-
     authorization_url, state = flow.authorization_url(
         access_type='offline',
         include_granted_scopes='true',
         prompt='consent'
     )
-
     request.session['state'] = state
     request.session['code_verifier'] = flow.code_verifier
 
@@ -34,22 +30,17 @@ def connect_gmail(request):
 def gmail_callback(request):
     state = request.session.get('state')
     code_verifier = request.session.get('code_verifier')
-
     flow = Flow.from_client_secrets_file(
         settings.GOOGLE_OAUTH_CLIENT_SECRETS_FILE,
         scopes=SCOPES,
         state=state,
         redirect_uri=settings.GOOGLE_REDIRECT_URI
     )
-
     flow.code_verifier = code_verifier
-
     flow.fetch_token(
         authorization_response=request.build_absolute_uri()
     )
-
     credentials = flow.credentials
-
     request.session['credentials'] = {
         'token': credentials.token,
         'refresh_token': credentials.refresh_token,
@@ -74,7 +65,6 @@ def test_gmail(request):
 
     creds = Credentials(**request.session['credentials'])
     service = build('gmail', 'v1', credentials=creds)
-
     service.users().messages().list(userId='me', maxResults=1).execute()
 
     return HttpResponse("Gmail API WORKING ")
@@ -86,16 +76,13 @@ def gmail_inbox(request):
 
     creds = Credentials(**request.session['credentials'])
     service = build('gmail', 'v1', credentials=creds)
-
     results = service.users().messages().list(
         userId='me',
         q="job OR hiring OR developer OR engineer",
         maxResults=10
     ).execute()
-
     messages = results.get('messages', [])
     email_list = []
-
     resume_text = request.session.get('resume_text', '')
     if not resume_text:
         resume_text = "python django react javascript html css"
@@ -106,9 +93,7 @@ def gmail_inbox(request):
             id=msg['id'],
             format='full'
         ).execute()
-
         headers = msg_data['payload']['headers']
-
         subject = None
         sender = 'Unknown'
 
@@ -132,7 +117,6 @@ def gmail_inbox(request):
 
         keywords = ['job', 'developer', 'engineer', 'hiring', 'interview']
         is_job = any(k in subject.lower() for k in keywords)
-
         job, created = JobEmail.objects.update_or_create(
             user=request.user,
             subject=subject,
@@ -143,7 +127,6 @@ def gmail_inbox(request):
                 'is_job': is_job
             }
         )
-
         email_list.append({
             'subject': subject,
             'role': job.role,

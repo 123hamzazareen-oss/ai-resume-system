@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Resume System - Intelligent Career Platform{% endblock %}
+
+{% block content %}
+<div class="glow-wrapper">
+    <!-- Glowing background blobs -->
+    <div class="glow-blob-1"></div>
+    <div class="glow-blob-2"></div>
+    <div class="glow-blob-3"></div>
+
+    <!-- Hero Section -->
+    <section class="hero-section" style="position: relative; z-index: 1;">
+        <div class="hero-badge">✦ Smart AI Job Matching</div>
+        <h1 class="hero-title">Improve Your Resume &amp; Find Your <br><span>Next Job Automatically</span></h1>
+        <p class="hero-subtitle">
+            Our smart AI reads your resume, gives you an instant match score, and securely scans your emails to find the best job matches for you.
+        </p>
+        <div class="hero-actions">
+            {% if user.is_authenticated %}
+                <a href="/dashboard/" class="btn-premium">Go to Dashboard &rarr;</a>
+                <a href="/resume/upload/" class="btn-secondary-custom">Upload Your Resume</a>
+            {% else %}
+                <a href="/login/" class="btn-premium">Get Started for Free &rarr;</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Trust & Stats Section -->
+    <section class="stats-container" style="margin-bottom: 7rem; position: relative; z-index: 1;">
+        <div class="stat-item" style="background: rgba(17, 24, 39, 0.45); backdrop-filter: blur(10px);">
+            <div class="stat-number">98%</div>
+            <div class="stat-label" style="font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">Reading Accuracy</div>
+        </div>
+        <div class="stat-item" style="background: rgba(17, 24, 39, 0.45); backdrop-filter: blur(10px);">
+            <div class="stat-number">10s</div>
+            <div class="stat-label" style="font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">10 Seconds Speed</div>
+        </div>
+        <div class="stat-item" style="background: rgba(17, 24, 39, 0.45); backdrop-filter: blur(10px);">
+            <div class="stat-number">1.5k+</div>
+            <div class="stat-label" style="font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">Jobs Matched</div>
+        </div>
+    </section>
+
+    <!-- Interactive ATS Simulator Section -->
+    <section class="section-header">
+        <h2 style="font-size: 2.25rem;">Test Your Resume Match</h2>
+        <p style="max-width: 600px; margin: 0.5rem auto 0 auto;">Choose a job path and click the skills you have. See how well your resume matches the job in real-time!</p>
+    </section>
+
+    <div class="simulator-container" style="max-width: 900px; padding: 0; background: transparent; border: none; box-shadow: none; margin-bottom: 7rem;">
+        <div class="sim-console">
+            <!-- Console Bar -->
+            <div class="sim-console-bar">
+                <div class="sim-dots">
+                    <div class="sim-dot red"></div>
+                    <div class="sim-dot yellow"></div>
+                    <div class="sim-dot green"></div>
+                </div>
+                <div class="sim-console-title">Resume_Score_Checker.sh</div>
+                <div style="width: 42px;"></div>
+            </div>
+
+            <!-- Console Body -->
+            <div class="sim-body">
+                <div class="simulator-grid" style="margin-bottom: 0;">
+                    <!-- Control Panel -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label-custom" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;" for="sim-domain">Choose Your Job Type</label>
+                            <select id="sim-domain" class="form-select-custom" onchange="updateSimDomain()" style="border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.25);">
+                                <option value="web_development">Web Development</option>
+                                <option value="python_development">Python Development</option>
+                                <option value="machine_learning">Machine Learning</option>
+                                <option value="data_analyst">Data Analyst</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label-custom" style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Select Your Skills</label>
+                            <div id="sim-skills-list" class="sim-tags-container" style="background: rgba(0, 0, 0, 0.15); border-color: rgba(255,255,255,0.05);">
+                                <!-- Javascript will populate tags here -->
+                            </div>
+                        </div>
+
+                        <div style="text-align: left;">
+                            <button class="btn-premium" onclick="calculateSimScore()" style="font-size: 0.9rem; padding: 0.65rem 1.5rem;">Check My Match Score</button>
+                        </div>
+                    </div>
+
+                    <!-- Output Console Screen -->
+                    <div style="display: flex; flex-direction: column; justify-content: center; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 1.5rem; min-height: 250px;">
+                        <!-- Initial state -->
+                        <div id="sim-initial-placeholder" style="text-align: center; color: var(--text-muted);">
+                            <span class="animated-float" style="display: inline-block; font-size: 2.5rem; margin-bottom: 0.75rem;">📊</span>
+                            <p style="font-size: 0.9rem;">Choose the skills you know and click the button to see your score!</p>
+                        </div>
+
+                        <!-- Result output -->
+                        <div id="sim-result" class="simulator-result-box" style="display: none; animation: fadeIn 0.4s ease; text-align: center;">
+                            <h4 style="font-size: 1.1rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Your Resume Match Score</h4>
+                            <div id="sim-score-circle" class="sim-score-circle" style="width: 90px; height: 90px; font-size: 1.75rem; border-width: 3px;">0%</div>
+                            <p id="sim-score-details" style="font-weight: 700; margin-bottom: 0.5rem; font-size: 1rem;"></p>
+                            <p id="sim-score-feedback" style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.85rem; line-height: 1.4;"></p>
+                            
+                            <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                                <p style="font-weight: 700; color: #a78bfa; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Skills you should add to your resume:</p>
+                                <div id="sim-missing-skills" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                                    <!-- Missing skills will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Capabilities (Features) Section -->
+    <section class="section-header">
+        <h2 style="font-size: 2.25rem;">What Our App Can Do For You</h2>
+        <p style="max-width: 600px; margin: 0.5rem auto 0 auto;">Everything you need to improve your resume and find matching jobs easily.</p>
+    </section>
+
+    <div class="grid-container" style="margin-bottom: 7rem;">
+        <div class="glass-card">
+            <div class="card-icon" style="background: rgba(79, 70, 229, 0.1); color: #818cf8;">⚡</div>
+            <h3 class="card-title">Read Your Resume</h3>
+            <p class="card-description">
+                Just upload your PDF or Word resume. Our AI reads all your skills and work experience instantly.
+            </p>
+        </div>
+        
+        <div class="glass-card">
+            <div class="card-icon" style="background: rgba(236, 72, 153, 0.1); color: #f472b6;">📈</div>
+            <h3 class="card-title">Improve Your Score</h3>
+            <p class="card-description">
+                We show you what skills are missing from your resume and help you fix them to get noticed by hiring managers.
+            </p>
+        </div>
+        
+        <div class="glass-card">
+            <div class="card-icon" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa;">📬</div>
+            <h3 class="card-title">Scan Your Emails</h3>
+            <p class="card-description">
+                Securely connect your Gmail. Our app automatically reads job emails and finds matching roles for you.
+            </p>
+        </div>
+        
+        <div class="glass-card">
+            <div class="card-icon" style="background: rgba(16, 185, 129, 0.1); color: #34d399;">🎯</div>
+            <h3 class="card-title">Smart Job Matching</h3>
+            <p class="card-description">
+                We compare the details of your resume with job emails and tell you exactly which jobs fit you best.
+            </p>
+        </div>
+    </div>
+
+    <!-- Pipeline / Architectural Pipeline Showcase -->
+    <section class="section-header">
+        <h2 style="font-size: 2.25rem;">How It Works</h2>
+        <p style="max-width: 600px; margin: 0.5rem auto 0 auto;">How our system reads your files and finds job matches behind the scenes.</p>
+    </section>
+
+    <div class="pipeline-grid" style="width: 90%; max-width: 1200px; margin: 0 auto 7rem auto;">
+        <!-- Step 1 -->
+        <div class="pipeline-card">
+            <div class="pipeline-step-badge">Step 01</div>
+            <div class="pipeline-card-icon">📁</div>
+            <h4 class="pipeline-card-title">Upload Resume</h4>
+            <p class="pipeline-card-desc">Upload your resume file. Our system reads the text securely.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="pipeline-card">
+            <div class="pipeline-step-badge" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);">Step 02</div>
+            <div class="pipeline-card-icon">🧠</div>
+            <h4 class="pipeline-card-title">Find Your Skills</h4>
+            <p class="pipeline-card-desc">We look at your skills to see which job field fits you best.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="pipeline-card">
+            <div class="pipeline-step-badge" style="background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);">Step 03</div>
+            <div class="pipeline-card-icon">📬</div>
+            <h4 class="pipeline-card-title">Read Job Emails</h4>
+            <p class="pipeline-card-desc">With your permission, we check your email inbox for job updates.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="pipeline-card">
+            <div class="pipeline-step-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Step 04</div>
+            <div class="pipeline-card-icon">🎯</div>
+            <h4 class="pipeline-card-title">Get Best Matches</h4>
+            <p class="pipeline-card-desc">We show you the best job matches on your personal dashboard.</p>
+        </div>
+    </div>
+
+    <!-- Tech Stack Showcase -->
+    <section class="section-header">
+        <h2 style="font-size: 2.25rem;">Powered by Reliable Technology</h2>
+        <p style="max-width: 600px; margin: 0.5rem auto 0 auto;">We use trusted tools to read, compare, and display your data safely.</p>
+    </section>
+
+    <div class="tech-container-box" style="margin-bottom: 7rem;">
+        <div class="tech-badge-card"><div class="tech-badge-dot"></div> Django (Safe Web Framework)</div>
+        <div class="tech-badge-card"><div class="tech-badge-dot"></div> Scikit-Learn (Smart Matching)</div>
+        <div class="tech-badge-card"><div class="tech-badge-dot"></div> PyMuPDF (Fast File Reader)</div>
+        <div class="tech-badge-card"><div class="tech-badge-dot"></div> PostgreSQL (Secure Database)</div>
+        <div class="tech-badge-card"><div class="tech-badge-dot"></div> Google Sign-In (Safe Connection)</div>
+        <div class="tech-badge-card"><div class="tech-badge-dot"></div> Cosine Similarity (Smart Comparisons)</div>
+        <div class="tech-badge-card"><div class="tech-badge-dot"></div> Python-Docx (Word File Reader)</div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="section-header">
+        <h2 style="font-size: 2.25rem;">Frequently Asked Questions</h2>
+        <p style="max-width: 600px; margin: 0.5rem auto 0 auto;">Simple answers to common questions about safety and matching.</p>
+    </section>
+
+    <div class="faq-container" style="margin-bottom: 7rem;">
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>How does the matching score work?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                Our system looks at the skills on your resume and compares them to the standard skills needed for your job field. It then gives you a score from 0 to 100 based on how many skills match.
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Is my Gmail connection safe?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                Yes, 100% safe. We only use official Google sign-in to read job-related emails. We never save your password, and we cannot send or delete emails.
+            </div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>How does it match jobs to my resume?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                We read the text of your resume and the text of the job emails. We then use a smart comparison method to see how similar they are and show you a percentage score.
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom CTA Banner -->
+    <section class="hero-section" style="padding: 5rem 0; border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); max-width: 1000px; margin: 0 auto 5rem auto; border-radius: 24px; background: rgba(17, 24, 39, 0.3); backdrop-filter: blur(10px);">
+        <h2 style="font-size: 2.25rem; margin-bottom: 1rem;">Ready to Find Your Next Job?</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+            Join us today to improve your resume and find matching jobs easily.
+        </p>
+        <div>
+            {% if user.is_authenticated %}
+                <a href="/dashboard/" class="btn-premium">Go to Your Dashboard</a>
+            {% else %}
+                <a href="/login/" class="btn-premium">Sign Up / Log In Now</a>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<!-- Client Side Scripts for Accordion & Simulator -->
+<script>
+    // FAQ Accordion Toggle
+    function toggleFaq(element) {
+        element.classList.toggle('active');
+    }
+
+    // ATS Simulator Logic
+    const SKILLS = {
+        web_development: ["html", "css", "javascript", "bootstrap", "react", "django"],
+        python_development: ["python", "django", "flask", "api", "backend"],
+        machine_learning: ["python", "machine learning", "deep learning", "tensorflow", "pytorch", "nlp"],
+        data_analyst: ["python", "sql", "data analysis", "pandas", "excel", "power bi"]
+    };
+
+    function updateSimDomain() {
+        const domain = document.getElementById("sim-domain").value;
+        const skills = SKILLS[domain];
+        const container = document.getElementById("sim-skills-list");
+        container.innerHTML = "";
+        
+        skills.forEach(skill => {
+            const tag = document.createElement("span");
+            tag.className = "sim-tag";
+            tag.innerText = skill;
+            tag.onclick = function() {
+                tag.classList.toggle("active");
+            };
+            container.appendChild(tag);
+        });
+
+        // Reset outputs
+        document.getElementById("sim-result").style.display = "none";
+        document.getElementById("sim-initial-placeholder").style.display = "block";
+    }
+
+    function calculateSimScore() {
+        const domain = document.getElementById("sim-domain").value;
+        const totalSkills = SKILLS[domain];
+        
+        // Count active tags
+        const container = document.getElementById("sim-skills-list");
+        const activeTags = container.getElementsByClassName("sim-tag active");
+        const selectedSkills = Array.from(activeTags).map(t => t.innerText);
+        
+        const matchedCount = selectedSkills.length;
+        const ratio = matchedCount / totalSkills.length;
+        const score = Math.round(ratio * 100);
+        
+        // Hide placeholder and show result box
+        document.getElementById("sim-initial-placeholder").style.display = "none";
+        const resultBox = document.getElementById("sim-result");
+        resultBox.style.display = "block";
+        
+        // Update circle score
+        const circle = document.getElementById("sim-score-circle");
+        circle.innerText = score + "%";
+        
+        // Reset classes
+        circle.className = "sim-score-circle";
+        if (score >= 70) {
+            circle.classList.add("high");
+            document.getElementById("sim-score-details").innerText = "Strong Match!";
+            document.getElementById("sim-score-feedback").innerText = "You have the right skills for this job! You are ready to apply.";
+        } else if (score >= 40) {
+            circle.classList.add("medium");
+            document.getElementById("sim-score-details").innerText = "Good Match!";
+            document.getElementById("sim-score-feedback").innerText = "You are close! Adding a few more skills will help you stand out.";
+        } else {
+            circle.classList.add("low");
+            document.getElementById("sim-score-details").innerText = "Weak Match";
+            document.getElementById("sim-score-feedback").innerText = "You are missing important skills for this job. Try learning or adding them.";
+        }
+        
+        // Calculate missing
+        const missingContainer = document.getElementById("sim-missing-skills");
+        missingContainer.innerHTML = "";
+        const missing = totalSkills.filter(s => !selectedSkills.includes(s));
+        
+        if (missing.length === 0) {
+            const tag = document.createElement("span");
+            tag.innerText = "You have all the required skills!";
+            tag.style.color = "var(--accent-green)";
+            tag.style.fontSize = "0.85rem";
+            tag.style.fontWeight = "600";
+            missingContainer.appendChild(tag);
+        } else {
+            missing.forEach(s => {
+                const tag = document.createElement("span");
+                tag.className = "sim-tag";
+                tag.style.borderColor = "rgba(236, 72, 153, 0.4)";
+                tag.style.color = "#fda4af";
+                tag.style.cursor = "default";
+                tag.innerText = s;
+                missingContainer.appendChild(tag);
+            });
+        }
+    }
+
+    // Initialize tags on load
+    document.addEventListener("DOMContentLoaded", function() {
+        updateSimDomain();
+    });
+</script>
+{% endblock %}

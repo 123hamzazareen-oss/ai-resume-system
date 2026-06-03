@@ -1,19 +1,37 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>AI Resume Analyzer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Resume System{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-
-<nav>
-    <a href="/dashboard/">Dashboard</a> |
-    <a href="/logout/">Logout</a>
-</nav>
-
-<hr>
-
-{% block content %}
-{% endblock %}
-
+    <nav class="navbar-custom">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand-custom">
+                <span>✦</span> AI Resume System
+            </a>
+            <div class="navbar-menu">
+                <a href="/" class="nav-link-custom">Home</a>
+                {% if user.is_authenticated %}
+                    <a href="/dashboard/" class="nav-link-custom">Dashboard</a>
+                    <a href="/logout/" class="btn-premium" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Logout</a>
+                {% else %}
+                    <a href="/login/" class="btn-premium" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer class="footer-custom">
+        <div class="container">
+            <p>&copy; 2026 AI Resume System. Elevate your career with AI-powered matching.</p>
+        </div>
+    </footer>
 </body>
 </html>

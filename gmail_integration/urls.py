@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-
 urlpatterns = [
     path('connect/', views.connect_gmail, name='connect_gmail'),
     path('callback/', views.gmail_callback, name='gmail_callback'),

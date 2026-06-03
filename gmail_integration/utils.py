@@ -1,13 +1,10 @@
 import os
 import base64
 import re
-
 from email import message_from_bytes
-
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
-
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 def get_flow():
@@ -26,15 +23,12 @@ def get_gmail_service(credentials_dict):
 def fetch_emails(service):
     results = service.users().messages().list(userId='me', maxResults=10).execute()
     messages = results.get('messages', [])
-
     emails = []
 
     for msg in messages:
         msg_data = service.users().messages().get(userId='me', id=msg['id']).execute()
-
         payload = msg_data.get('payload', {})
         parts = payload.get('parts', [])
-
         data = ""
 
         if parts:
@@ -52,7 +46,6 @@ def fetch_emails(service):
 
 def extract_job_from_email(text):
     text = text.lower()
-
     job = {}
 
     if "developer" in text:
