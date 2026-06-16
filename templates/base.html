@@ -17,9 +17,11 @@
                 <a href="/" class="nav-link-custom">Home</a>
                 {% if user.is_authenticated %}
                     <a href="/dashboard/" class="nav-link-custom">Dashboard</a>
+                    <a href="/gmail/connect/" class="nav-link-custom">Connect Gmail</a>
                     <a href="/logout/" class="btn-premium" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Logout</a>
                 {% else %}
-                    <a href="/login/" class="btn-premium" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Login</a>
+                    <a href="/login/" class="nav-link-custom">Login</a>
+                    <a href="/register/" class="btn-premium" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Register</a>
                 {% endif %}
             </div>
         </div>

@@ -1000,3 +1000,430 @@ h1, h2, h3, h4, h5, h6 {
     animation: float 5s ease-in-out infinite;
 }
 
+/* ---------------------------------------------------
+   PREMIUM REDESIGN UTILITY CLASSES
+   --------------------------------------------------- */
+
+.hero-grid-layout {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6rem 0 4rem 0;
+}
+
+@media (max-width: 1024px) {
+    .hero-grid-layout {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding: 4rem 0 2rem 0;
+        text-align: center;
+    }
+}
+
+/* Glassmorphic Mockup Dashboard for Hero Section */
+.mock-analyzer-container {
+    background: rgba(13, 20, 35, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 24px;
+    padding: 1.75rem;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 
+                0 0 40px rgba(99, 102, 241, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+}
+
+.mock-analyzer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.mock-window-dots {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.mock-window-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.mock-window-dot.active-red { background: #ef4444; }
+.mock-window-dot.active-yellow { background: #f59e0b; }
+.mock-window-dot.active-green { background: #10b981; }
+
+.mock-analyzer-title {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.mock-file-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.mock-file-icon {
+    font-size: 1.75rem;
+    animation: float 4s ease-in-out infinite;
+}
+
+.mock-file-details {
+    flex-grow: 1;
+}
+
+.mock-file-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.mock-file-progress {
+    height: 5px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.mock-file-progress-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5, #ec4899);
+    border-radius: 3px;
+    position: relative;
+}
+
+.mock-file-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: mockScan 1.8s infinite linear;
+}
+
+@keyframes mockScan {
+    0% { left: -30px; }
+    100% { left: 100%; }
+}
+
+.mock-skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.mock-skill-pill {
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+}
+
+.mock-skill-pill:hover {
+    background: rgba(99, 102, 241, 0.15);
+    transform: scale(1.05);
+}
+
+.mock-match-display {
+    background: rgba(16, 185, 129, 0.03);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mock-match-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mock-match-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.mock-match-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #34d399;
+}
+
+.mock-match-score {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* SVG Circular Progress Ring CSS */
+.progress-ring-svg {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-circle-bg {
+    fill: transparent;
+    stroke: rgba(255, 255, 255, 0.04);
+}
+
+.progress-ring-circle {
+    fill: transparent;
+    stroke: url(#gradient-progress);
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.simulator-result-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sim-score-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 1.5rem 0;
+}
+
+.sim-score-circle-new {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+}
+
+.sim-metrics-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 0.65rem 1.25rem;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.sim-metric-val {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Dynamic Live Scanning Grid styling */
+.scan-glow-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #818cf8, #d8b4fe, transparent);
+    box-shadow: 0 0 12px rgba(129, 140, 248, 0.8);
+    pointer-events: none;
+    animation: runGlowLine 3s infinite ease-in-out;
+}
+
+@keyframes runGlowLine {
+    0% { top: 0%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+/* ---------------------------------------------------
+   DASHBOARD & UPLOAD REDESIGN STYLES
+   --------------------------------------------------- */
+
+.dashboard-progress {
+    height: 24px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.dashboard-progress-fill {
+    height: 100%;
+    background: var(--primary-gradient);
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: width 1s ease-out;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+.glass-list-item {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-secondary) !important;
+    padding: 1rem 1.25rem !important;
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+}
+
+.glass-list-item:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
+    color: var(--text-primary) !important;
+}
+
+.glass-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.glass-table th {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    font-weight: 700;
+    text-align: left;
+    color: var(--text-primary);
+}
+
+.glass-table td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    color: var(--text-secondary);
+}
+
+.glass-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Custom styled badge classes */
+.badge-custom-skill {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #c7d2fe;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    display: inline-block;
+    margin: 0.25rem;
+}
+
+.badge-custom-missing {
+    background: rgba(236, 72, 153, 0.1);
+    border: 1px solid rgba(236, 72, 153, 0.3);
+    color: #fbcfe8;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    display: inline-block;
+    margin: 0.25rem;
+}
+
+.dashboard-job-card {
+    background: rgba(17, 24, 39, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-left: 5px solid var(--accent-blue);
+    border-radius: 16px;
+    transition: var(--transition-smooth);
+}
+
+.dashboard-job-card:hover {
+    background: rgba(17, 24, 39, 0.55);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-job-card.high-match {
+    border-left-color: var(--accent-green);
+}
+
+.dashboard-job-card.medium-match {
+    border-left-color: #f59e0b;
+}
+
+.dashboard-job-card.low-match {
+    border-left-color: var(--accent-pink);
+}
+
+/* Document Upload Zone Design */
+.upload-drop-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.01);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-drop-zone:hover {
+    border-color: var(--accent-purple);
+    background: rgba(124, 58, 237, 0.02);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    animation: float 4s ease-in-out infinite;
+}
+
+.upload-input-hidden {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+
+

@@ -1,343 +1,241 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-    <style>
-        body {
-            background-color: #f4f6f9;
-            font-family: Arial, sans-serif;
-        }
+{% extends 'base.html' %}
 
-        .navbar-custom {
-            background-color: #0d6efd;
-        }
+{% block title %}User Dashboard - AI Resume System{% endblock %}
 
-        .navbar-custom .navbar-brand,
-        .navbar-custom .navbar-text {
-            color: white;
-        }
-
-        .dashboard-title {
-            font-weight: bold;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .skill-badge {
-            margin: 5px;
-            padding: 10px 14px;
-            font-size: 14px;
-        }
-
-        .job-card {
-            border-left: 5px solid #0d6efd;
-        }
-
-        .match-high {
-            color: green;
-            font-weight: bold;
-        }
-
-        .match-medium {
-            color: orange;
-            font-weight: bold;
-        }
-
-        .match-low {
-            color: red;
-            font-weight: bold;
-        }
-
-        .table thead {
-            background-color: #0d6efd;
-            color: white;
-        }
-
-        .progress {
-            height: 28px;
-            border-radius: 20px;
-        }
-    </style>
-</head>
-
-<body>
-<nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
-    <div class="container">
-        <a class="navbar-brand" href="#">
-            AI Resume Analyzer
-        </a>
-
-        <div class="ms-auto">
-            <span class="navbar-text me-3">
-                Welcome: {{ request.user.username }}
-            </span>
-
-            <a href="/logout/" class="btn btn-light btn-sm">
-                Logout
-            </a>
-        </div>
-    </div>
-</nav>
-
-<!-- MAIN -->
-<div class="container mt-5 mb-5">
-    <h2 class="dashboard-title">
-        Dashboard
-    </h2>
-
-    <div class="row g-4 mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4 h-100">
-                <h5>
-                    Detected Domain
-                </h5>
-
-                <h3 class="text-primary mt-3">
-                    {{ domain }}
-                </h3>
+{% block content %}
+<div class="glow-wrapper" style="padding: 3rem 0;">
+    <!-- Glowing background blobs -->
+    <div class="glow-blob-1"></div>
+    <div class="glow-blob-2"></div>
+    <div class="glow-blob-3"></div>
+    
+    <div style="width: 90%; max-width: 1200px; margin: 0 auto;">
+        <!-- Top welcome/header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1.5rem;">
+            <div>
+                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">User Dashboard</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 0; font-size: 1rem;">
+                    Welcome back, <span style="color: var(--text-primary); font-weight: 600;">{{ request.user.username }}</span>. Track and match your career metrics.
+                </p>
             </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4 h-100">
-                <h5>
-                    ATS Score
-                </h5>
-
-                <h3 class="text-success mt-3">
-                    {{ ats_score }}/100
-                </h3>
-
-                <div class="mt-4">
-                    <div class="progress">
-                        <div
-                            class="progress-bar bg-success"
-                            role="progressbar"
-                            data-width="{{ ats_score }}"
-                        >
-                            {{ ats_score }}%
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4 h-100">
-                <h4 class="section-title">
-                    Skills
-                </h4>
-
-                {% if skills %}
-
-                    {% for skill in skills %}
-
-                        <span class="badge bg-primary skill-badge">
-                            {{ skill }}
-                        </span>
-                    {% endfor %}
-
+            <div>
+                {% if not gmail_connected %}
+                    <a href="/gmail/connect/" class="btn-premium" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);">
+                        <span>🔗</span> Connect Gmail Account
+                    </a>
                 {% else %}
-
-                    <p>No skills found.</p>
+                    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.25rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; border-radius: 9999px; font-size: 0.9rem; font-weight: 600;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                        Gmail Sync Active
+                    </div>
                 {% endif %}
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card shadow-sm p-4 h-100">
-                <h4 class="section-title">
-                    Missing Skills
-                </h4>
-
-                {% if missing_skills %}
-
-                    {% for skill in missing_skills %}
-
-                        <span class="badge bg-danger skill-badge">
-                            {{ skill }}
-                        </span>
-                    {% endfor %}
-
-                {% else %}
-
-                    <p>No missing skills.</p>
-                {% endif %}
+        <!-- Upper Row Metrics: Domain & ATS Score -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+            <!-- Domain Card -->
+            <div class="glass-card" style="padding: 2rem;">
+                <p style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Career Domain Profile</p>
+                <h5 style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 0.5rem;">Detected Track</h5>
+                <h2 style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; font-weight: 800;">
+                    {{ domain|default:"Not Detected" }}
+                </h2>
             </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm p-4 mb-4">
-        <h4 class="section-title">
-            Suggestions
-        </h4>
-
-        <ul class="list-group list-group-flush">
-            {% for suggestion in suggestions %}
-
-                <li class="list-group-item">
-                    {{ suggestion }}
-                </li>
-
-            {% empty %}
-
-                <li class="list-group-item">
-                    No suggestions available.
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="card shadow-sm p-4 mb-4">
-        <h4 class="section-title">
-            Live Job Matches
-        </h4>
-
-        {% if jobs %}
-
-            {% for job in jobs %}
-
-                <div class="card job-card shadow-sm mb-3">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>
-                                    {{ job.subject }}
-                                </h5>
-
-                                <p class="mb-1">
-                                    <strong>Company:</strong>
-                                    {{ job.company }}
-                                </p>
-
-                                {% if job.matched_skills %}
-
-                                    <p class="mt-2">
-                                        <strong>Matched Skills:</strong>
-                                        {% for skill in job.matched_skills %}
-
-                                            <span class="badge bg-success">
-                                                {{ skill }}
-                                            </span>
-                                        {% endfor %}
-                                    </p>
-                                {% endif %}
-
-                                <p class="text-muted mb-0">
-                                    {{ job.sender }}
-                                </p>
-                            </div>
-
-                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                                <h4 class="text-primary">
-                                    {{ job.match_score }}%
-                                </h4>
-
-                                {% if job.match_level == 'High' %}
-
-                                    <span class="match-high">
-                                        High Match
-                                    </span>
-
-                                {% elif job.match_level == 'Medium' %}
-
-                                    <span class="match-medium">
-                                        Medium Match
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="match-low">
-                                        Low Match
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </div>
+            
+            <!-- ATS Score Card -->
+            <div class="glass-card" style="padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <p style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Resume ATS Score</p>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.75rem;">
+                        <span style="font-size: 1.1rem; color: var(--text-secondary);">Overall Alignment</span>
+                        <span style="font-size: 2rem; font-weight: 800; color: #10b981;">{{ ats_score }}<span style="font-size: 1.25rem; font-weight: 500; color: var(--text-secondary);">/100</span></span>
                     </div>
                 </div>
-            {% endfor %}
+                <div class="dashboard-progress">
+                    <div class="dashboard-progress-fill" style="width: {{ ats_score }}%;">
+                        {{ ats_score }}%
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        {% else %}
-
-            <p>No matching jobs found.</p>
-        {% endif %}
-    </div>
-
-    <div class="card shadow-sm p-4">
-        <h4 class="section-title">
-            Previous Match History
-        </h4>
-
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Job Title</th>
-                        <th>Company</th>
-                        <th>Score</th>
-                        <th>Match Type</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for match in previous_matches %}
-
-                        <tr>
-                            <td>{{ match.job.title }}</td>
-                            <td>{{ match.job.company }}</td>
-                            <td>{{ match.score }}%</td>
-                            <td>{{ match.match_type }}</td>
-                        </tr>
-
+        <!-- Middle Row: Skills, Missing Skills, Suggestions -->
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem; margin-bottom: 2.5rem;">
+            <!-- Skills & Missing Skills Card -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Skills Panel -->
+                <div class="glass-card" style="padding: 2rem; flex: 1;">
+                    <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent-blue);">✦</span> Extracted Skills
+                    </h3>
+                    <div style="margin: -0.25rem; display: flex; flex-wrap: wrap;">
+                        {% if skills %}
+                            {% for skill in skills %}
+                                <span class="badge-custom-skill">{{ skill }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">No skills parsed yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Missing Skills Panel -->
+                <div class="glass-card" style="padding: 2rem; flex: 1;">
+                    <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent-pink);">✦</span> Target Gaps / Missing
+                    </h3>
+                    <div style="margin: -0.25rem; display: flex; flex-wrap: wrap;">
+                        {% if missing_skills %}
+                            {% for skill in missing_skills %}
+                                <span class="badge-custom-missing">{{ skill }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <p style="color: var(--accent-green); font-size: 0.95rem; font-weight: 600; padding: 0.4rem;">✓ Excellent! No critical skills missing.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suggestions Panel -->
+            <div class="glass-card" style="padding: 2rem;">
+                <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="color: var(--accent-purple);">✦</span> AI Optimization Suggestions
+                </h3>
+                <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;">
+                    {% for suggestion in suggestions %}
+                        <div class="glass-list-item">
+                            💡 {{ suggestion }}
+                        </div>
                     {% empty %}
-
-                        <tr>
-                            <td colspan="4" class="text-center">
-                                No previous match history.
-                            </td>
-                        </tr>
+                        <div class="glass-list-item" style="color: var(--text-muted);">
+                            No suggestions available. Keep your resume updated to generate optimization tips.
+                        </div>
                     {% endfor %}
-                </tbody>
-            </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Job Matches -->
+        <div class="glass-card" style="padding: 2.5rem; margin-bottom: 2.5rem;">
+            <h3 style="font-size: 1.6rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: var(--accent-blue);">🎯</span> Live Inbox Job Matches
+            </h3>
+            
+            {% if gmail_connected %}
+                {% if jobs %}
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        {% for job in jobs %}
+                            <div class="dashboard-job-card {% if job.match_level == 'High' %}high-match{% elif job.match_level == 'Medium' %}medium-match{% else %}low-match{% endif %}" style="padding: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                                    <div style="flex-grow: 1;">
+                                        <h4 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">
+                                            {{ job.subject }}
+                                        </h4>
+                                        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.75rem;">
+                                            <strong>Company:</strong> {{ job.company }}
+                                        </p>
+                                        {% if job.matched_skills %}
+                                            <div style="margin-bottom: 0.75rem;">
+                                                <strong style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Matched Resume Skills:</strong>
+                                                {% for skill in job.matched_skills %}
+                                                    <span style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); color: #a7f3d0; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-block; margin-right: 0.35rem; margin-bottom: 0.35rem; font-weight: 600;">
+                                                        {{ skill }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                        <p style="color: var(--text-muted); font-size: 0.8rem; font-family: monospace; margin-bottom: 0;">
+                                            From: {{ job.sender }}
+                                        </p>
+                                    </div>
+                                    <div style="text-align: right; min-width: 120px;">
+                                        <h3 style="font-size: 1.8rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem;">
+                                            {{ job.match_score }}%
+                                        </h3>
+                                        <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: {% if job.match_level == 'High' %}#10b981{% elif job.match_level == 'Medium' %}#f59e0b{% else %}#ec4899{% endif %};">
+                                            {{ job.match_level }} Match
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem 0; color: var(--text-muted);">
+                        <span style="font-size: 2.5rem; display: block; margin-bottom: 1rem;">🔍</span>
+                        <p style="font-size: 1.1rem; margin-bottom: 0;">No matching job notification digests found in your email.</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.25rem;">Make sure you have active career subscription digests in your synced folder.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 16px; padding: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 700;">Gmail Integration Pending</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0; max-width: 600px; line-height: 1.5;">
+                            Sync your account with Gmail OAuth 2.0 to scan job notifications from LinkedIn &amp; Indeed digests automatically and compare alignment scores.
+                        </p>
+                    </div>
+                    <a href="/gmail/connect/" class="btn-premium">
+                        Connect Gmail Account
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Previous Match History -->
+        <div class="glass-card" style="padding: 2.5rem;">
+            <h3 style="font-size: 1.6rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: var(--accent-purple);">📊</span> Cumulative Match History
+            </h3>
+            
+            <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;">
+                <table class="glass-table">
+                    <thead>
+                        <tr>
+                            <th>Job Position</th>
+                            <th>Company</th>
+                            <th>Alignment Score</th>
+                            <th>Category Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in previous_matches %}
+                            <tr>
+                                <td style="font-weight: 700; color: var(--text-primary);">{{ match.job.title }}</td>
+                                <td>{{ match.job.company }}</td>
+                                <td style="font-weight: 800; color: var(--text-primary);">
+                                    {{ match.score }}%
+                                </td>
+                                <td>
+                                    <span style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: {% if match.match_type == 'High' %}#10b981{% elif match.match_type == 'Medium' %}#f59e0b{% else %}#ec4899{% endif %};">
+                                        {{ match.match_type }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2.5rem 0;">
+                                    No historical match scores recorded yet. Connect Gmail or analyze a profile to start tracking results.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const progressBar = document.querySelector(".progress-bar");
-
-    if (progressBar) {
-
-        const widthValue = progressBar.getAttribute("data-width");
-
-        if (widthValue) {
-
-            progressBar.style.width = widthValue + "%";
-
+    document.addEventListener("DOMContentLoaded", function () {
+        const progressBar = document.querySelector(".dashboard-progress-fill");
+        if (progressBar) {
+            progressBar.style.width = "0%";
+            setTimeout(() => {
+                progressBar.style.width = "{{ ats_score }}%";
+            }, 100);
         }
-
-    }
-
-});
+    });
 </script>
-</body>
-</html>
+{% endblock %}

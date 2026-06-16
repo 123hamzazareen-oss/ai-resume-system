@@ -13,29 +13,45 @@
             </p>
         </div>
 
+        {% if messages %}
+            <div style="margin-bottom: 1.5rem;">
+                {% for message in messages %}
+                    <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 0.85rem 1.25rem; border-radius: 12px; text-align: left;">
+                        <p style="margin: 0; font-size: 0.85rem; font-weight: 600;">{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <form method="POST">
             {% csrf_token %}
 
-            {% if form.errors or form.non_field_errors %}
+            {% if form.non_field_errors %}
                 <div class="auth-errors">
-                    {% if form.non_field_errors %}
-                        {% for error in form.non_field_errors %}
-                            <p style="margin: 0; font-size: 0.85rem;">{{ error }}</p>
-                        {% endfor %}
-                    {% else %}
-                        <p style="margin: 0; font-size: 0.85rem;">Please check your credentials and try again.</p>
-                    {% endif %}
+                    {% for error in form.non_field_errors %}
+                        <p style="margin: 0; font-size: 0.85rem;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% elif form.errors %}
+                <div class="auth-errors">
+                    <p style="margin: 0; font-size: 0.85rem;">Please check your credentials and try again.</p>
                 </div>
             {% endif %}
 
             <div class="auth-input-group">
-                <label for="{{ form.username.id_for_label }}">Username or Email</label>
-                {{ form.username }}
+                <label for="{{ form.username_or_email.id_for_label }}">Username or Email</label>
+                {{ form.username_or_email }}
+                {% if form.username_or_email.errors %}
+                    <p style="color: #fda4af; font-size: 0.8rem; margin: 0.25rem 0 0 0;">{{ form.username_or_email.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <div class="auth-input-group" style="margin-top: 1.25rem;">
                 <label for="{{ form.password.id_for_label }}">Password</label>
                 {{ form.password }}
+                {% if form.password.errors %}
+                    <p style="color: #fda4af; font-size: 0.8rem; margin: 0.25rem 0 0 0;">{{ form.password.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <button type="submit" class="btn-premium" style="justify-content: center; margin-top: 2rem; width: 100%; font-size: 0.95rem; padding: 0.85rem 0;">
@@ -44,8 +60,7 @@
         </form>
 
         <div style="margin-top: 2rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
-            <p style="margin-bottom: 0.5rem; color: #a78bfa; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">✦ Auto-Registration Active ✦</p>
-            <p style="line-height: 1.5;">First time here? Enter a new username and password, and we will create your account automatically.</p>
+            <p>Don't have an account? <a href="{% url 'register' %}" style="color: #a78bfa; text-decoration: none; font-weight: 600;">Register Now</a></p>
         </div>
     </div>
 </div>

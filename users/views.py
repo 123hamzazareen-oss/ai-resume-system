@@ -1,11 +1,13 @@
 import base64
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate, logout as django_logout
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from job_matcher.models import Job, MatchResult
 from users.services.match_engine import MatchEngine
+from .forms import RegisterForm, LoginForm
 # ---------------------------------------------------
 # HOME
 # ---------------------------------------------------
@@ -218,13 +220,38 @@ def dashboard(request):
                     print("BODY PARSE ERROR:", e)
 
                 # ---------------------------------------------------
+                # EXTRACT ROLE + COMPANY
+                # ---------------------------------------------------
+                role = subject.strip()
+                company = "Unknown"
+
+                if " at " in subject.lower():
+                    parts = subject.split(" at ")
+                    role = parts[0].strip()
+                    company = parts[1].strip()
+
+                # ---------------------------------------------------
+                # CHECK IF DIGEST EMAIL
+                # ---------------------------------------------------
+                # Indeed digests contain phrases like "and 24 more Web Developer jobs" in company
+                is_digest = (
+                    "indeed" in sender.lower() or
+                    "jobalert" in sender.lower() or
+                    "digest" in subject.lower() or
+                    "more jobs" in subject.lower() or
+                    "more jobs" in company.lower()
+                )
+
+                # ---------------------------------------------------
                 # COMPLETE EMAIL TEXT
                 # ---------------------------------------------------
-                text_blob = f"""
-                {subject}
-                {snippet}
-                {body}
-                """
+                if is_digest:
+                    # For digests, we take the subject, snippet, and the top part of the body (first 1500 chars)
+                    # to capture the first job's details while avoiding matching unrelated jobs listed further down.
+                    text_blob = f"{subject}\n{snippet}\n{body[:1500]}"
+                else:
+                    text_blob = f"{subject}\n{snippet}\n{body}"
+
                 text_blob_lower = text_blob.lower()
 
                 # ---------------------------------------------------
@@ -258,17 +285,6 @@ def dashboard(request):
                     for keyword in valid_keywords
                 ):
                     continue
-
-                # ---------------------------------------------------
-                # EXTRACT ROLE + COMPANY
-                # ---------------------------------------------------
-                role = subject.strip()
-                company = "Unknown"
-
-                if " at " in subject.lower():
-                    parts = subject.split(" at ")
-                    role = parts[0].strip()
-                    company = parts[1].strip()
 
                 # ---------------------------------------------------
                 # REMOVE DUPLICATES
@@ -379,3 +395,56 @@ def dashboard(request):
         "gmail_connected": gmail_connected,
         "previous_matches": previous_matches
     })
+
+
+# ---------------------------------------------------
+# REGISTER
+# ---------------------------------------------------
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+        
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f"Account created successfully for {user.first_name}! You can now log in.")
+            return redirect('login')
+    else:
+        form = RegisterForm()
+        
+    return render(request, 'users/register.html', {'form': form})
+
+
+# ---------------------------------------------------
+# LOGIN
+# ---------------------------------------------------
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+        
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username_or_email = form.cleaned_data.get('username_or_email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username_or_email, password=password)
+            if user is not None:
+                login(request, user)
+                next_url = request.GET.get('next', 'dashboard')
+                return redirect(next_url)
+            else:
+                form.add_error(None, "Invalid username/email or password.")
+    else:
+        form = LoginForm()
+        
+    return render(request, 'users/login.html', {'form': form})
+
+
+# ---------------------------------------------------
+# LOGOUT
+# ---------------------------------------------------
+def logout_view(request):
+    django_logout(request)
+    return redirect('login')
+
