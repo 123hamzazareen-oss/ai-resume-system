@@ -1,62 +1,215 @@
 {% extends 'base.html' %}
 
+{% block title %}Resume ATS Report - {{ domain_display }} - ResumeAI{% endblock %}
+
 {% block content %}
-
-<div style="width:80%; margin:auto; font-family:Arial;">
-    <h1>Resume Analysis Result</h1>
-    {% if error %}
-        <div style="background:#ffdddd; padding:15px; border-radius:10px;">
-            <p>{{ error }}</p>
+<div class="saas-container" style="max-width: 1040px; padding-top: 2rem; padding-bottom: 4rem;">
+    <!-- Page Header Bar -->
+    <div class="page-header-bar" style="margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color);">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: #ecfeff; border: 1px solid #a5f3fc; color: #0891b2; padding: 0.3rem 0.85rem; border-radius: var(--radius-full); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.65rem; font-family: 'Space Grotesk', sans-serif;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                Comprehensive ATS Evaluation
+            </div>
+            <h1 class="page-title font-display" style="font-size: 2.2rem; margin-bottom: 0.45rem;">
+                Resume ATS Analysis Report
+            </h1>
+            <p class="page-subtitle" style="font-size: 0.98rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                {% if resume %}Document: <strong style="color: #0f172a; font-family: 'Sora', sans-serif;">{{ resume.file.name|slice:"8:" }}</strong> &bull; {% endif %}
+                Detected Track: <strong style="color: #0f766e; font-family: 'Space Grotesk', sans-serif;">{{ domain_display }}</strong>
+            </p>
         </div>
-    {% else %}
-
-        <div style="background:#f5f5f5; padding:20px; border-radius:10px; margin-top:20px;">
-            <h2>Detected Domain: {{ domain }}</h2>
-            <h3>ATS Score: {{ ats_score }}/100</h3>
-            <hr>
-            <h3>Extracted Skills</h3>
-            <ul>
-                {% for skill in skills %}
-                    <li>{{ skill }}</li>
-                {% empty %}
-                    <li>No skills detected</li>
-                {% endfor %}
-            </ul>
-
-            <hr>
-            <h3>Missing Skills</h3>
-            <ul>
-                {% for skill in missing_skills %}
-                    <li>{{ skill }}</li>
-                {% empty %}
-                    <li>No missing skills</li>
-                {% endfor %}
-            </ul>
-
-            <hr>
-            <h3>Suggestions</h3>
-            {% if suggestions %}
-                <ul>
-                    {% for s in suggestions %}
-                        <li>{{ s }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div style="background:#ddffdd; padding:15px; border-radius:10px;">
-                    Your resume looks strong for {{ domain }} roles.
-                </div>
-            {% endif %}
-
-            <br>
-            <a href="/dashboard/"
-               style="padding:10px 20px;
-               background:black;
-               color:white;
-               text-decoration:none;
-               border-radius:5px;">
-               Go to Dashboard
+        <div class="page-header-actions" style="display: flex; gap: 0.75rem; align-items: center;">
+            <a href="/resume/upload/" class="btn-saas-secondary" style="padding: 0.55rem 1.15rem; font-size: 0.86rem; font-family: 'Sora', sans-serif; font-weight: 600;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload New Version
+            </a>
+            <a href="/dashboard/" class="btn-saas-primary" style="padding: 0.55rem 1.25rem; font-size: 0.86rem; font-family: 'Sora', sans-serif; font-weight: 700;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Dashboard &rarr;
             </a>
         </div>
-    {% endif %}
+    </div>
+
+    <!-- Score & Track Overview Card (Deluxe Multi-Color Banner) -->
+    <div class="card-saas" style="padding: 2.25rem; margin-bottom: 2rem; border-radius: var(--radius-xl); box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05); background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-color: #bbf7d0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+            <!-- Score Block -->
+            <div style="display: flex; align-items: center; gap: 1.75rem;">
+                <div class="score-dial-badge" style="width: 100px; height: 100px; border-color: {{ score_color }};">
+                    <span class="font-num" style="font-size: 2.35rem; font-weight: 800; line-height: 1; color: {{ score_color }};">
+                        {{ ats_score }}%
+                    </span>
+                    <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem; font-weight: 700; color: #64748b; letter-spacing: 0.06em;">ATS SCORE</span>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.45rem;">
+                        <h3 class="font-display" style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin: 0;">
+                            ATS Compatibility Score
+                        </h3>
+                        <span class="score-badge-tier score-tier-{{ score_tier|lower }}" style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; padding: 0.25rem 0.75rem;">
+                            {{ score_tier }} Alignment
+                        </span>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.96rem; margin: 0; line-height: 1.5; font-family: 'Plus Jakarta Sans', sans-serif;">
+                        {{ score_verdict }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Domain Track Info Box -->
+            <div style="background: #ffffff; border: 1px solid #c7d2fe; border-radius: var(--radius-lg); padding: 1.15rem 1.6rem; text-align: right; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.06);">
+                <div style="font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; text-transform: uppercase; color: #4338ca; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 0.2rem;">Career Path Track</div>
+                <div class="font-display" style="font-size: 1.35rem; font-weight: 800; color: #1e1b4b;">{{ domain_display }}</div>
+                <div style="font-size: 0.84rem; color: #0f766e; font-weight: 700; font-family: 'Space Grotesk', sans-serif; margin-top: 0.25rem;">
+                    {{ matched_domain_skills|length }} of {{ domain_expected_skills|length }} benchmark skills verified
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Breakdown (2 Columns) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; margin-bottom: 2rem;">
+        <!-- Extracted Skills -->
+        <div class="card-saas" style="padding: 1.85rem; margin-bottom: 0; border-radius: var(--radius-xl);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.35rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #ecfeff; color: #0891b2; display: flex; align-items: center; justify-content: center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display" style="font-size: 1.18rem; font-weight: 700; color: #0f172a; margin: 0;">
+                            Identified Skills ({{ skills|length }})
+                        </h3>
+                    </div>
+                </div>
+                <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; color: #64748b; font-weight: 600;">Parsed from Resume</span>
+            </div>
+
+            {% if skills %}
+                <div class="skill-tags-group">
+                    {% for skill in skills %}
+                        {% if "react" in skill|lower or "javascript" in skill|lower or "vue" in skill|lower or "css" in skill|lower or "html" in skill|lower or "frontend" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-frontend" title="Frontend Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% elif "sql" in skill|lower or "postgres" in skill|lower or "database" in skill|lower or "mongo" in skill|lower or "redis" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-database" title="Database Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% elif "ai" in skill|lower or "machine" in skill|lower or "deep" in skill|lower or "nlp" in skill|lower or "tensor" in skill|lower or "torch" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-ai" title="AI / Machine Learning Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% elif "docker" in skill|lower or "aws" in skill|lower or "cloud" in skill|lower or "api" in skill|lower or "rest" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-cloud" title="Cloud & API Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% else %}
+                            <span class="chip-skill-colored chip-tag-backend" title="Backend Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">No technical competencies identified in document.</p>
+            {% endif %}
+        </div>
+
+        <!-- Missing Recommended Skills -->
+        <div class="card-saas" style="padding: 1.85rem; margin-bottom: 0; border-radius: var(--radius-xl);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.35rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display" style="font-size: 1.18rem; font-weight: 700; color: #0f172a; margin: 0;">
+                            Recommended Keywords ({{ missing_skills|length }})
+                        </h3>
+                    </div>
+                </div>
+                <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; color: #be123c; font-weight: 700;">Target Track Gaps</span>
+            </div>
+
+            {% if missing_skills %}
+                <div class="skill-tags-group">
+                    {% for skill in missing_skills %}
+                        <span class="chip-skill-colored chip-tag-gap">
+                            + {{ skill }}
+                        </span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1rem 1.25rem; border-radius: var(--radius-md); color: #047857; font-size: 0.92rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem; font-family: 'Sora', sans-serif;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    Excellent! All expected industry benchmarks satisfied.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Optimization Recommendations -->
+    <div class="card-saas" style="padding: 2rem; margin-bottom: 2rem; border-radius: var(--radius-xl); box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);">
+        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.5rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.15rem;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fffbeb; color: #d97706; display: flex; align-items: center; justify-content: center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+            </div>
+            <div>
+                <h3 class="font-display" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">
+                    Actionable ATS Optimization Guidance
+                </h3>
+                <p style="margin: 0; color: #64748b; font-size: 0.88rem; font-family: 'Plus Jakarta Sans', sans-serif;">Priority improvements to ensure optimal scoring across applicant tracking parsers.</p>
+            </div>
+        </div>
+
+        <div>
+            {% for suggestion in suggestions %}
+                <div class="rec-card-deluxe" style="--rec-accent: {% if forloop.first %}#6366f1{% elif forloop.counter == 2 %}#f59e0b{% elif forloop.counter == 3 %}#06b6d4{% else %}#10b981{% endif %};">
+                    <div class="rec-icon-circle" style="--rec-bg: {% if forloop.first %}#eef2ff{% elif forloop.counter == 2 %}#fffbeb{% elif forloop.counter == 3 %}#ecfeff{% else %}#ecfdf5{% endif %}; --rec-accent: {% if forloop.first %}#4f46e5{% elif forloop.counter == 2 %}#d97706{% elif forloop.counter == 3 %}#0284c7{% else %}#059669{% endif %};">
+                        {% if forloop.first %}
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                        {% elif forloop.counter == 2 %}
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        {% else %}
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        {% endif %}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="margin-bottom: 0.35rem;">
+                            <span class="rec-pill-tag" style="background: {% if forloop.first %}#eef2ff; color: #4338ca; border: 1px solid #c7d2fe;{% elif forloop.counter == 2 %}#fffbeb; color: #b45309; border: 1px solid #fde68a;{% elif forloop.counter == 3 %}#ecfeff; color: #0e7490; border: 1px solid #a5f3fc;{% else %}#ecfdf5; color: #047857; border: 1px solid #a7f3d0;{% endif %}">
+                                {% if forloop.first %}P1 &bull; High Impact Recommendation{% elif forloop.counter == 2 %}P2 &bull; ATS Keyword Optimization{% else %}Actionable Best Practice{% endif %}
+                            </span>
+                        </div>
+                        <p style="font-size: 0.94rem; color: #334155; margin: 0; line-height: 1.6; font-family: 'Plus Jakarta Sans', sans-serif;">
+                            {{ suggestion }}
+                        </p>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 1.5rem; text-align: center; color: #047857;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-bottom: 0.5rem;"><polyline points="20 6 9 17 4 12"/></svg>
+                    <p style="font-family: 'Sora', sans-serif; font-weight: 700; margin: 0;">No suggestions needed. Document meets standard ATS conventions!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 0.5rem;">
+        <a href="/dashboard/" class="btn-saas-secondary" style="font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 600;">
+            &larr; Back to Dashboard
+        </a>
+        <a href="/jobs/" class="btn-saas-primary" style="font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 700;">
+            Explore Matching Jobs &rarr;
+        </a>
+    </div>
 </div>
 {% endblock %}
+

@@ -1,241 +1,697 @@
 {% extends 'base.html' %}
 
-{% block title %}User Dashboard - AI Resume System{% endblock %}
+{% block title %}Dashboard &bull; ATS Analytics &amp; Job Matches - ResumeAI{% endblock %}
 
 {% block content %}
-<div class="glow-wrapper" style="padding: 3rem 0;">
-    <!-- Glowing background blobs -->
-    <div class="glow-blob-1"></div>
-    <div class="glow-blob-2"></div>
-    <div class="glow-blob-3"></div>
-    
-    <div style="width: 90%; max-width: 1200px; margin: 0 auto;">
-        <!-- Top welcome/header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1.5rem;">
-            <div>
-                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">User Dashboard</h1>
-                <p style="color: var(--text-secondary); margin-bottom: 0; font-size: 1rem;">
-                    Welcome back, <span style="color: var(--text-primary); font-weight: 600;">{{ request.user.username }}</span>. Track and match your career metrics.
-                </p>
+<div class="saas-container">
+    <!-- Executive Midnight Aurora Hero Banner -->
+    <section class="dash-hero-deluxe">
+        <div style="position: relative; z-index: 2;">
+            <div class="dash-badge-luminous">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                </svg>
+                AI Candidate Intelligence Hub
             </div>
+            <h1 class="dash-hero-title">
+                Welcome back, <span class="dash-hero-title-highlight">{{ request.user.first_name|default:request.user.username }}</span>
+            </h1>
+            <p class="dash-hero-desc">
+                Evaluate your resume against enterprise ATS filters, uncover high-impact keyword benchmarks, and sync real-time opportunities.
+            </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; position: relative; z-index: 2;">
+            {% if active_resume %}
+                <div class="dash-chip-glass" title="Currently Active Resume Version">
+                    <span class="dash-active-pulse"></span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span style="opacity: 0.75; font-size: 0.8rem;">Active:</span>
+                    <strong style="color: #ffffff; font-family: 'Space Grotesk', sans-serif;">{{ active_resume.file.name|slice:"8:"|truncatechars:18 }}</strong>
+                </div>
+            {% endif %}
+
+            {% if gmail_connected %}
+                <div class="dash-chip-glass sync-active">
+                    <span class="dash-active-pulse"></span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <span style="font-weight: 700; font-family: 'Space Grotesk', sans-serif;">Gmail Sync Active</span>
+                </div>
+            {% else %}
+                <a href="/gmail/connect/" class="dash-chip-glass" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15); color: #fde68a;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <span>Connect Gmail</span>
+                </a>
+            {% endif %}
+
+            <a href="/resume/upload/" class="btn-saas-primary" style="padding: 0.65rem 1.35rem; font-family: 'Sora', sans-serif; font-size: 0.88rem; box-shadow: 0 4px 15px rgba(13, 148, 136, 0.4);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload Resume
+            </a>
+        </div>
+    </section>
+
+    <!-- Multi-Colored Deluxe KPI Cards (4 Distinct Visual Schemes) -->
+    <section class="dash-kpi-grid">
+        <!-- KPI 1: ATS Match Score (Emerald Theme) -->
+        <div class="dash-kpi-card kpi-emerald">
             <div>
-                {% if not gmail_connected %}
-                    <a href="/gmail/connect/" class="btn-premium" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);">
-                        <span>🔗</span> Connect Gmail Account
-                    </a>
+                <div class="kpi-top-row">
+                    <span class="kpi-label">ATS Compatibility</span>
+                    <div class="kpi-icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="kpi-value-huge" style="color: #059669;">
+                    {{ ats_score }}<span style="font-size: 1.25rem; color: #94a3b8; font-weight: 500;">/100</span>
+                </div>
+
+                <div class="kpi-progress-track">
+                    <div class="kpi-progress-bar" style="width: {{ ats_score }}%;"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.65rem;">
+                <span class="score-badge-tier score-tier-{{ score_tier|lower }}" style="font-family: 'Space Grotesk', sans-serif;">
+                    {{ score_tier }} Match
+                </span>
+                <a href="/resume/result/" style="color: #059669; font-size: 0.82rem; font-weight: 700; font-family: 'Sora', sans-serif; text-decoration: none;">
+                    Detailed Report &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- KPI 2: Target Career Track (Electric Indigo Theme) -->
+        <div class="dash-kpi-card kpi-indigo">
+            <div>
+                <div class="kpi-top-row">
+                    <span class="kpi-label">Career Domain</span>
+                    <div class="kpi-icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="font-display" style="font-size: 1.45rem; font-weight: 800; color: #1e1b4b; line-height: 1.25; margin-bottom: 0.75rem; min-height: 2.5rem; display: flex; align-items: center;">
+                    {{ domain_display }}
+                </div>
+            </div>
+
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.65rem; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; color: #4338ca; font-family: 'Space Grotesk', sans-serif;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #6366f1;"></span>
+                    NLP Classification
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI 3: Skills Found (Cyber Cyan Theme) -->
+        <div class="dash-kpi-card kpi-cyan">
+            <div>
+                <div class="kpi-top-row">
+                    <span class="kpi-label">Verified Competencies</span>
+                    <div class="kpi-icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="kpi-value-huge" style="color: #0284c7;">
+                    {{ skills|length }}
+                </div>
+            </div>
+
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.65rem; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; color: #0369a1; font-family: 'Space Grotesk', sans-serif;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    Extracted from Resume
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI 4: Benchmark Gaps (Sunset Coral Theme) -->
+        <div class="dash-kpi-card {% if missing_skills %}kpi-rose{% else %}kpi-emerald{% endif %}">
+            <div>
+                <div class="kpi-top-row">
+                    <span class="kpi-label">Benchmark Gaps</span>
+                    <div class="kpi-icon-box">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="kpi-value-huge" style="color: {% if missing_skills %}#e11d48{% else %}#059669{% endif %};">
+                    {{ missing_skills|length }}
+                </div>
+            </div>
+
+            <div>
+                {% if missing_skills %}
+                    <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.65rem; background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; color: #be123c; font-family: 'Space Grotesk', sans-serif;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #f43f5e;"></span>
+                        Keywords to Incorporate
+                    </div>
                 {% else %}
-                    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.25rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; border-radius: 9999px; font-size: 0.9rem; font-weight: 600;">
-                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-                        Gmail Sync Active
+                    <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.65rem; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; color: #047857; font-family: 'Space Grotesk', sans-serif;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        Full Track Alignment
                     </div>
                 {% endif %}
             </div>
         </div>
+    </section>
 
-        <!-- Upper Row Metrics: Domain & ATS Score -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
-            <!-- Domain Card -->
-            <div class="glass-card" style="padding: 2rem;">
-                <p style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Career Domain Profile</p>
-                <h5 style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 0.5rem;">Detected Track</h5>
-                <h2 style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; font-weight: 800;">
-                    {{ domain|default:"Not Detected" }}
-                </h2>
-            </div>
-            
-            <!-- ATS Score Card -->
-            <div class="glass-card" style="padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                    <p style="font-family: monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">Resume ATS Score</p>
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.75rem;">
-                        <span style="font-size: 1.1rem; color: var(--text-secondary);">Overall Alignment</span>
-                        <span style="font-size: 2rem; font-weight: 800; color: #10b981;">{{ ats_score }}<span style="font-size: 1.25rem; font-weight: 500; color: var(--text-secondary);">/100</span></span>
+    <!-- Target Job Description Comparator -->
+    <section class="card-saas" id="job-comparator-section" style="border-radius: var(--radius-xl); box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);">
+        <div class="card-saas-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 1.35rem;">
+            <div>
+                <h3 class="card-saas-title font-display" style="font-size: 1.35rem; color: #0f172a;">
+                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #eef2ff; color: #4f46e5; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                     </div>
-                </div>
-                <div class="dashboard-progress">
-                    <div class="dashboard-progress-fill" style="width: {{ ats_score }}%;">
-                        {{ ats_score }}%
-                    </div>
-                </div>
+                    Target Job Alignment &amp; Description Comparator
+                </h3>
+                <p class="card-saas-desc">
+                    Score your active resume directly against open requisitions or paste target specifications to run instant mathematical TF-IDF cosine comparison.
+                </p>
             </div>
+            <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; padding: 0.35rem 0.85rem; border-radius: var(--radius-full); background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%); color: #0f766e; font-weight: 700; border: 1px solid #ccfbf1;">
+                Scikit-Learn TF-IDF Cosine Matcher
+            </span>
         </div>
 
-        <!-- Middle Row: Skills, Missing Skills, Suggestions -->
-        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem; margin-bottom: 2.5rem;">
-            <!-- Skills & Missing Skills Card -->
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
-                <!-- Skills Panel -->
-                <div class="glass-card" style="padding: 2rem; flex: 1;">
-                    <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="color: var(--accent-blue);">✦</span> Extracted Skills
-                    </h3>
-                    <div style="margin: -0.25rem; display: flex; flex-wrap: wrap;">
-                        {% if skills %}
-                            {% for skill in skills %}
-                                <span class="badge-custom-skill">{{ skill }}</span>
-                            {% endfor %}
-                        {% else %}
-                            <p style="color: var(--text-muted); font-size: 0.95rem;">No skills parsed yet.</p>
-                        {% endif %}
+        <!-- Comparator Dual Pane Input -->
+        <form method="POST" action="/dashboard/#job-comparator-section">
+            {% csrf_token %}
+            <input type="hidden" name="compare_job" value="1">
+
+            <div class="comparator-grid">
+                <!-- Option A: Existing Jobs -->
+                <div class="comparator-pane-card">
+                    <span class="comparator-pane-badge badge-pane-indigo">Option A &bull; Database Library</span>
+                    <label style="display: block; font-family: 'Sora', sans-serif; font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 0.45rem;">
+                        Choose an Existing Job Posting ({{ available_jobs|length }} Available)
+                    </label>
+                    <select name="selected_job_id" id="comparator-job-select" class="form-control" onchange="handleJobSelectChange(this)" style="font-size: 0.92rem; border-color: #cbd5e1;">
+                        <option value="">-- Choose from available database listings --</option>
+                        {% for j in available_jobs %}
+                            <option value="{{ j.id }}" data-title="{{ j.title }}" data-desc="{{ j.description|escapejs }}">{{ j.title }} &bull; {{ j.company }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div style="margin-top: 1.25rem;">
+                        <label style="display: block; font-family: 'Sora', sans-serif; font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 0.45rem;">
+                            Target Role Title (Optional)
+                        </label>
+                        <input type="text" name="target_job_title" id="comparator-job-title" class="form-control" placeholder="e.g. Senior Backend Engineer" value="{{ custom_match_result.title|default:'' }}" style="font-size: 0.92rem; border-color: #cbd5e1;">
                     </div>
                 </div>
-                
-                <!-- Missing Skills Panel -->
-                <div class="glass-card" style="padding: 2rem; flex: 1;">
-                    <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="color: var(--accent-pink);">✦</span> Target Gaps / Missing
-                    </h3>
-                    <div style="margin: -0.25rem; display: flex; flex-wrap: wrap;">
-                        {% if missing_skills %}
-                            {% for skill in missing_skills %}
-                                <span class="badge-custom-missing">{{ skill }}</span>
+
+                <!-- Option B: Custom JD Paste -->
+                <div class="comparator-pane-card">
+                    <span class="comparator-pane-badge badge-pane-teal">Option B &bull; Custom Job Spec</span>
+                    <label style="display: block; font-family: 'Sora', sans-serif; font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 0.45rem;">
+                        Paste Target Job Description (JD)
+                    </label>
+                    <textarea name="target_job_description" id="comparator-job-desc" class="form-control" rows="5" placeholder="Paste requirements, stack specifications, responsibilities, or qualification criteria..." style="font-size: 0.92rem; border-color: #cbd5e1; line-height: 1.55;">{{ custom_match_result.description|default:'' }}</textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
+                <button type="submit" class="btn-saas-primary" style="padding: 0.75rem 1.75rem; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.92rem; border-radius: var(--radius-full); box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    Run Target Comparison &rarr;
+                </button>
+            </div>
+        </form>
+
+        <!-- Custom Match Result Card -->
+        {% if custom_match_result %}
+            <div class="comparator-result-deluxe">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(13, 148, 136, 0.15); padding-bottom: 1.25rem;">
+                    <div>
+                        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #0d9488; background: #ccfbf1; padding: 0.2rem 0.65rem; border-radius: var(--radius-full);">
+                            AI Fit Analysis Result
+                        </span>
+                        <h4 class="font-display" style="font-size: 1.55rem; font-weight: 800; color: #0f172a; margin-top: 0.45rem; margin-bottom: 0;">
+                            {{ custom_match_result.title }}
+                        </h4>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 1.25rem;">
+                        <div class="score-dial-badge" style="border-color: {% if custom_match_result.match_level == 'High' %}#10b981{% elif custom_match_result.match_level == 'Medium' %}#f59e0b{% else %}#f43f5e{% endif %};">
+                            <span class="font-num" style="font-size: 2.1rem; font-weight: 800; line-height: 1; color: {% if custom_match_result.match_level == 'High' %}#059669{% elif custom_match_result.match_level == 'Medium' %}#d97706{% else %}#e11d48{% endif %};">
+                                {{ custom_match_result.score }}%
+                            </span>
+                            <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; font-weight: 700; color: #64748b; letter-spacing: 0.05em;">ALIGNMENT</span>
+                        </div>
+                        <div>
+                            <span class="score-badge-tier score-tier-{{ custom_match_result.match_level|lower }}" style="font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; padding: 0.35rem 0.85rem;">
+                                {{ custom_match_result.match_level }} Fit Tier
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <!-- Matched Skills -->
+                    <div>
+                        <div style="font-family: 'Sora', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: #047857; font-weight: 700; margin-bottom: 0.65rem; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            Overlapping Skills Found ({{ custom_match_result.matched_skills|length }})
+                        </div>
+                        <div class="skill-tags-group">
+                            {% for s in custom_match_result.matched_skills %}
+                                <span class="chip-skill-colored chip-tag-database">
+                                    {{ s }}
+                                </span>
+                            {% empty %}
+                                <span style="font-size: 0.88rem; color: #64748b;">No overlapping keywords detected in target spec.</span>
                             {% endfor %}
-                        {% else %}
-                            <p style="color: var(--accent-green); font-size: 0.95rem; font-weight: 600; padding: 0.4rem;">✓ Excellent! No critical skills missing.</p>
-                        {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Missing Skills -->
+                    <div>
+                        <div style="font-family: 'Sora', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: #be123c; font-weight: 700; margin-bottom: 0.65rem; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Recommended Keyword Additions
+                        </div>
+                        <div class="skill-tags-group">
+                            {% for s in custom_match_result.missing_skills %}
+                                <span class="chip-skill-colored chip-tag-gap">
+                                    + {{ s }}
+                                </span>
+                            {% empty %}
+                                <span style="font-size: 0.88rem; color: #059669; font-weight: 700;">Zero skill gaps detected! 100% keyword coverage.</span>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Suggestions Panel -->
-            <div class="glass-card" style="padding: 2rem;">
-                <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="color: var(--accent-purple);">✦</span> AI Optimization Suggestions
-                </h3>
-                <div style="background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden;">
-                    {% for suggestion in suggestions %}
-                        <div class="glass-list-item">
-                            💡 {{ suggestion }}
-                        </div>
+        {% endif %}
+    </section>
+
+    <!-- 2-Column Skills Matrix & AI Recommendations (Vibrant Multi-Color Layout) -->
+    <section style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Left Column: Competencies & Gaps -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Extracted Skills -->
+            <div class="card-saas" style="margin-bottom: 0; border-radius: var(--radius-xl);">
+                <div class="card-saas-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 1.15rem;">
+                    <div>
+                        <h3 class="card-saas-title font-display" style="font-size: 1.25rem; color: #0f172a;">
+                            <div style="width: 28px; height: 28px; border-radius: 6px; background: #ecfeff; color: #0891b2; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </div>
+                            Extracted Skills ({{ skills|length }})
+                        </h3>
+                        <p class="card-saas-desc">Technical competencies categorized across your document.</p>
+                    </div>
+                    <a href="/resume/result/" style="font-family: 'Sora', sans-serif; font-size: 0.82rem; color: #0d9488; font-weight: 700; text-decoration: none;">
+                        Full Report &rarr;
+                    </a>
+                </div>
+
+                <div class="skill-tags-group">
+                    {% for skill in skills %}
+                        {% if "react" in skill|lower or "javascript" in skill|lower or "vue" in skill|lower or "css" in skill|lower or "html" in skill|lower or "frontend" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-frontend" title="Frontend Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% elif "sql" in skill|lower or "postgres" in skill|lower or "database" in skill|lower or "mongo" in skill|lower or "redis" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-database" title="Database Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% elif "ai" in skill|lower or "machine" in skill|lower or "deep" in skill|lower or "nlp" in skill|lower or "tensor" in skill|lower or "torch" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-ai" title="AI / Machine Learning Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% elif "docker" in skill|lower or "aws" in skill|lower or "cloud" in skill|lower or "api" in skill|lower or "rest" in skill|lower %}
+                            <span class="chip-skill-colored chip-tag-cloud" title="Cloud & API Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% else %}
+                            <span class="chip-skill-colored chip-tag-backend" title="Backend Competency">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                {{ skill }}
+                            </span>
+                        {% endif %}
                     {% empty %}
-                        <div class="glass-list-item" style="color: var(--text-muted);">
-                            No suggestions available. Keep your resume updated to generate optimization tips.
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">No skills identified yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Missing Target Gaps -->
+            <div class="card-saas" style="margin-bottom: 0; border-radius: var(--radius-xl);">
+                <div class="card-saas-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 1.15rem;">
+                    <div>
+                        <h3 class="card-saas-title font-display" style="font-size: 1.25rem; color: #0f172a;">
+                            <div style="width: 28px; height: 28px; border-radius: 6px; background: #fff1f2; color: #e11d48; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            </div>
+                            Benchmark Skill Gaps ({{ missing_skills|length }})
+                        </h3>
+                        <p class="card-saas-desc">Target keywords commonly expected for {{ domain_display }}.</p>
+                    </div>
+                </div>
+
+                <div class="skill-tags-group">
+                    {% for skill in missing_skills %}
+                        <span class="chip-skill-colored chip-tag-gap">
+                            + {{ skill }}
+                        </span>
+                    {% empty %}
+                        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; color: #047857;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.92rem;">Outstanding! All core track benchmark skills covered.</span>
                         </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- Live Job Matches -->
-        <div class="glass-card" style="padding: 2.5rem; margin-bottom: 2.5rem;">
-            <h3 style="font-size: 1.6rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                <span style="color: var(--accent-blue);">🎯</span> Live Inbox Job Matches
-            </h3>
-            
-            {% if gmail_connected %}
-                {% if jobs %}
-                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-                        {% for job in jobs %}
-                            <div class="dashboard-job-card {% if job.match_level == 'High' %}high-match{% elif job.match_level == 'Medium' %}medium-match{% else %}low-match{% endif %}" style="padding: 1.5rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
-                                    <div style="flex-grow: 1;">
-                                        <h4 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">
-                                            {{ job.subject }}
-                                        </h4>
-                                        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.75rem;">
-                                            <strong>Company:</strong> {{ job.company }}
-                                        </p>
-                                        {% if job.matched_skills %}
-                                            <div style="margin-bottom: 0.75rem;">
-                                                <strong style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Matched Resume Skills:</strong>
-                                                {% for skill in job.matched_skills %}
-                                                    <span style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); color: #a7f3d0; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 6px; display: inline-block; margin-right: 0.35rem; margin-bottom: 0.35rem; font-weight: 600;">
-                                                        {{ skill }}
-                                                    </span>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        <p style="color: var(--text-muted); font-size: 0.8rem; font-family: monospace; margin-bottom: 0;">
-                                            From: {{ job.sender }}
-                                        </p>
+        <!-- Right Column: AI Optimization Suggestions -->
+        <div class="card-saas" style="margin-bottom: 0; border-radius: var(--radius-xl);">
+            <div class="card-saas-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 1.15rem;">
+                <div>
+                    <h3 class="card-saas-title font-display" style="font-size: 1.25rem; color: #0f172a;">
+                        <div style="width: 28px; height: 28px; border-radius: 6px; background: #fffbeb; color: #d97706; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        </div>
+                        Strategic Optimization Guidance
+                    </h3>
+                    <p class="card-saas-desc">Personalized AI recommendations to elevate candidate score.</p>
+                </div>
+            </div>
+
+            <div>
+                {% for suggestion in suggestions %}
+                    <div class="rec-card-deluxe" style="--rec-accent: {% if forloop.first %}#6366f1{% elif forloop.counter == 2 %}#f59e0b{% elif forloop.counter == 3 %}#06b6d4{% else %}#10b981{% endif %};">
+                        <div class="rec-icon-circle" style="--rec-bg: {% if forloop.first %}#eef2ff{% elif forloop.counter == 2 %}#fffbeb{% elif forloop.counter == 3 %}#ecfeff{% else %}#ecfdf5{% endif %}; --rec-accent: {% if forloop.first %}#4f46e5{% elif forloop.counter == 2 %}#d97706{% elif forloop.counter == 3 %}#0284c7{% else %}#059669{% endif %};">
+                            {% if forloop.first %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                            {% elif forloop.counter == 2 %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                            {% else %}
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            {% endif %}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="margin-bottom: 0.35rem;">
+                                <span class="rec-pill-tag" style="background: {% if forloop.first %}#eef2ff; color: #4338ca; border: 1px solid #c7d2fe;{% elif forloop.counter == 2 %}#fffbeb; color: #b45309; border: 1px solid #fde68a;{% elif forloop.counter == 3 %}#ecfeff; color: #0e7490; border: 1px solid #a5f3fc;{% else %}#ecfdf5; color: #047857; border: 1px solid #a7f3d0;{% endif %}">
+                                    {% if forloop.first %}P1 &bull; High Impact Recommendation{% elif forloop.counter == 2 %}P2 &bull; ATS Keyword Optimization{% else %}Actionable Best Practice{% endif %}
+                                </span>
+                            </div>
+                            <p style="font-size: 0.92rem; color: #334155; margin: 0; line-height: 1.55; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                {{ suggestion }}
+                            </p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 1.5rem; text-align: center; color: #047857;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-bottom: 0.5rem;"><polyline points="20 6 9 17 4 12"/></svg>
+                        <p style="font-family: 'Sora', sans-serif; font-weight: 700; margin: 0;">No active suggestions. Resume meets high-tier standards!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Resume Uploads History -->
+    <section class="card-saas" style="border-radius: var(--radius-xl); box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);">
+        <div class="card-saas-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 1.15rem;">
+            <div>
+                <h3 class="card-saas-title font-display" style="font-size: 1.25rem; color: #0f172a;">
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #f0fdfa; color: #0d9488; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    Resume Document History
+                </h3>
+                <p class="card-saas-desc">Version catalog parsed and scored for this candidate profile.</p>
+            </div>
+            <a href="/resume/upload/" class="btn-saas-secondary" style="font-family: 'Sora', sans-serif; font-size: 0.85rem; padding: 0.45rem 1rem; border-radius: var(--radius-full); font-weight: 700;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Upload New Version
+            </a>
+        </div>
+
+        <div class="modern-table-wrapper" style="border-radius: var(--radius-md); overflow: hidden;">
+            <table class="modern-table">
+                <thead>
+                    <tr style="background: #f8fafc;">
+                        <th style="font-family: 'Sora', sans-serif;">Document Name</th>
+                        <th style="font-family: 'Sora', sans-serif;">Timestamp</th>
+                        <th style="font-family: 'Sora', sans-serif;">ATS Match</th>
+                        <th style="font-family: 'Sora', sans-serif;">Rating Tier</th>
+                        <th style="font-family: 'Sora', sans-serif;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in recent_resumes %}
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 36px; height: 36px; border-radius: 8px; background: {% if '.pdf' in r.file.name|lower %}#fff1f2; color: #e11d48; border: 1px solid #fecdd3;{% else %}#eff6ff; color: #2563eb; border: 1px solid #bfdbfe;{% endif %} display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.75rem;">
+                                        {% if '.pdf' in r.file.name|lower %}PDF{% else %}DOC{% endif %}
                                     </div>
-                                    <div style="text-align: right; min-width: 120px;">
-                                        <h3 style="font-size: 1.8rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem;">
-                                            {{ job.match_score }}%
-                                        </h3>
-                                        <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: {% if job.match_level == 'High' %}#10b981{% elif job.match_level == 'Medium' %}#f59e0b{% else %}#ec4899{% endif %};">
-                                            {{ job.match_level }} Match
-                                        </span>
+                                    <div>
+                                        <strong style="color: #0f172a; font-size: 0.95rem; font-family: 'Sora', sans-serif;">{{ r.file.name|slice:"8:" }}</strong>
+                                        {% if forloop.first %}
+                                            <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); font-weight: 700; margin-left: 0.4rem;">ACTIVE</span>
+                                        {% endif %}
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            </td>
+                            <td style="color: #64748b; font-size: 0.88rem; font-family: 'Space Grotesk', sans-serif;">
+                                {{ r.uploaded_at|date:"M d, Y" }} &bull; {{ r.uploaded_at|date:"H:i" }}
+                            </td>
+                            <td>
+                                <span class="font-num" style="font-weight: 800; font-size: 1.15rem; color: {% if r.ats_score >= 70 %}#059669{% elif r.ats_score >= 45 %}#d97706{% else %}#e11d48{% endif %};">
+                                    {{ r.ats_score|floatformat:0 }}%
+                                </span>
+                            </td>
+                            <td>
+                                <span class="score-badge-tier {% if r.ats_score >= 70 %}score-tier-high{% elif r.ats_score >= 45 %}score-tier-medium{% else %}score-tier-low{% endif %}" style="font-family: 'Space Grotesk', sans-serif;">
+                                    {% if r.ats_score >= 70 %}Strong Match{% elif r.ats_score >= 45 %}Moderate Match{% else %}Needs Work{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/resume/result/{{ r.id }}/" class="btn-saas-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.82rem; border-radius: var(--radius-full); font-family: 'Sora', sans-serif; font-weight: 600;">
+                                    View Report &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state-card" style="padding: 2.75rem 1rem;">
+                                    <div style="width: 56px; height: 56px; margin: 0 auto 1rem auto; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    </div>
+                                    <h4 class="empty-state-title font-display">No Uploaded Resumes Found</h4>
+                                    <p class="empty-state-desc">Upload your resume document to compute compliance metrics and match job alerts.</p>
+                                    <a href="/resume/upload/" class="btn-saas-primary" style="font-size: 0.88rem; font-family: 'Sora', sans-serif;">Upload Resume Now</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Live Email Job Matches (Gmail Sync Section) -->
+    <section class="card-saas" style="border-radius: var(--radius-xl); box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);">
+        <div class="card-saas-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 1.15rem;">
+            <div>
+                <h3 class="card-saas-title font-display" style="font-size: 1.25rem; color: #0f172a;">
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #ecfeff; color: #0891b2; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                     </div>
-                {% else %}
-                    <div style="text-align: center; padding: 3rem 0; color: var(--text-muted);">
-                        <span style="font-size: 2.5rem; display: block; margin-bottom: 1rem;">🔍</span>
-                        <p style="font-size: 1.1rem; margin-bottom: 0;">No matching job notification digests found in your email.</p>
-                        <p style="font-size: 0.85rem; margin-top: 0.25rem;">Make sure you have active career subscription digests in your synced folder.</p>
-                    </div>
-                {% endif %}
-            {% else %}
-                <div style="background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 16px; padding: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
-                    <div>
-                        <h4 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.2rem; font-weight: 700;">Gmail Integration Pending</h4>
-                        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0; max-width: 600px; line-height: 1.5;">
-                            Sync your account with Gmail OAuth 2.0 to scan job notifications from LinkedIn &amp; Indeed digests automatically and compare alignment scores.
-                        </p>
-                    </div>
-                    <a href="/gmail/connect/" class="btn-premium">
-                        Connect Gmail Account
-                    </a>
-                </div>
+                    Scanned Job Opportunities
+                </h3>
+                <p class="card-saas-desc">Positions detected from incoming alerts via connected Gmail OAuth 2.0.</p>
+            </div>
+            {% if gmail_connected %}
+                <a href="/gmail/inbox/" class="btn-saas-secondary" style="font-family: 'Sora', sans-serif; font-size: 0.85rem; padding: 0.45rem 1rem; border-radius: var(--radius-full); font-weight: 700;">
+                    View Raw Email Inbox &rarr;
+                </a>
             {% endif %}
         </div>
 
-        <!-- Previous Match History -->
-        <div class="glass-card" style="padding: 2.5rem;">
-            <h3 style="font-size: 1.6rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                <span style="color: var(--accent-purple);">📊</span> Cumulative Match History
-            </h3>
-            
-            <div style="overflow-x: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;">
-                <table class="glass-table">
-                    <thead>
-                        <tr>
-                            <th>Job Position</th>
-                            <th>Company</th>
-                            <th>Alignment Score</th>
-                            <th>Category Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for match in previous_matches %}
-                            <tr>
-                                <td style="font-weight: 700; color: var(--text-primary);">{{ match.job.title }}</td>
-                                <td>{{ match.job.company }}</td>
-                                <td style="font-weight: 800; color: var(--text-primary);">
-                                    {{ match.score }}%
-                                </td>
-                                <td>
-                                    <span style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: {% if match.match_type == 'High' %}#10b981{% elif match.match_type == 'Medium' %}#f59e0b{% else %}#ec4899{% endif %};">
-                                        {{ match.match_type }}
-                                    </span>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2.5rem 0;">
-                                    No historical match scores recorded yet. Connect Gmail or analyze a profile to start tracking results.
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+        {% if gmail_connected %}
+            {% if jobs %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.35rem;">
+                    {% for job in jobs %}
+                        <div class="dashboard-job-card {% if job.match_level == 'High' %}high-match{% elif job.match_level == 'Medium' %}medium-match{% else %}low-match{% endif %}" style="padding: 1.6rem; border-radius: var(--radius-lg); display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.85rem;">
+                                    <h4 class="font-display" style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.35;">
+                                        {{ job.subject }}
+                                    </h4>
+                                    <div style="text-align: right; flex-shrink: 0;">
+                                        <span class="font-num" style="font-size: 1.5rem; font-weight: 800; color: {% if job.match_level == 'High' %}#059669{% elif job.match_level == 'Medium' %}#d97706{% else %}#e11d48{% endif %};">
+                                            {{ job.match_score }}%
+                                        </span>
+                                    </div>
+                                </div>
 
+                                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 0.85rem;">
+                                    <strong style="color: #1e293b;">Company:</strong> {{ job.company }}
+                                </p>
+
+                                {% if job.matched_skills %}
+                                    <div style="margin-bottom: 1.15rem;">
+                                        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 0.45rem; letter-spacing: 0.05em;">
+                                            Matched Skills:
+                                        </div>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                                            {% for skill in job.matched_skills %}
+                                                <span class="chip-skill-colored chip-tag-frontend" style="font-size: 0.75rem; padding: 0.2rem 0.55rem;">
+                                                    {{ skill }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div style="border-top: 1px solid #f1f5f9; padding-top: 0.85rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #94a3b8; font-family: 'Space Grotesk', sans-serif;">
+                                <span>From: {{ job.sender|truncatechars:26 }}</span>
+                                <span class="score-badge-tier score-tier-{{ job.match_level|lower }}" style="font-size: 0.72rem; padding: 0.2rem 0.6rem;">
+                                    {{ job.match_level }} Match
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state-card" style="padding: 2.75rem 1rem;">
+                    <div style="width: 56px; height: 56px; margin: 0 auto 1rem auto; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
+                    <h4 class="empty-state-title font-display">No Matching Job Alerts in Synced Mail</h4>
+                    <p class="empty-state-desc">
+                        Scanned recent notifications for {{ domain_display }} keywords. When job alerts arrive from LinkedIn, Indeed, or Glassdoor, they will automatically appear here.
+                    </p>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Google OAuth Connect Deluxe Card -->
+            <div style="background: linear-gradient(135deg, #f0fdfa 0%, #eef2ff 100%); border: 1px solid #99f6e4; border-radius: var(--radius-xl); padding: 2.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.5rem;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: #ffffff; display: flex; align-items: center; justify-content: center; color: #0f766e; box-shadow: var(--shadow-sm);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        </div>
+                        <h4 class="font-display" style="color: #0f172a; margin: 0; font-size: 1.3rem; font-weight: 800;">Connect Gmail Account with OAuth 2.0</h4>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.95rem; margin: 0; max-width: 650px; line-height: 1.55;">
+                        Link your Google email via read-only OAuth 2.0 to scan incoming career notifications and compare jobs directly against your resume keywords.
+                    </p>
+                </div>
+                <a href="/gmail/connect/" class="btn-saas-primary" style="padding: 0.85rem 1.75rem; font-family: 'Sora', sans-serif; font-weight: 700;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Connect Gmail Account
+                </a>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- Cumulative Match History Table -->
+    <section class="card-saas" style="border-radius: var(--radius-xl); box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);">
+        <div class="card-saas-header" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 1.15rem;">
+            <div>
+                <h3 class="card-saas-title font-display" style="font-size: 1.25rem; color: #0f172a;">
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #eef2ff; color: #4f46e5; display: inline-flex; align-items: center; justify-content: center; margin-right: 0.35rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    </div>
+                    Cumulative Match History ({{ previous_matches|length }})
+                </h3>
+                <p class="card-saas-desc">Historical similarity records computed across past comparisons.</p>
+            </div>
+            <a href="/jobs/" class="btn-saas-secondary" style="font-family: 'Sora', sans-serif; font-size: 0.85rem; padding: 0.45rem 1rem; border-radius: var(--radius-full); font-weight: 700;">
+                All Job Matches &rarr;
+            </a>
+        </div>
+
+        <div class="modern-table-wrapper" style="border-radius: var(--radius-md); overflow: hidden;">
+            <table class="modern-table">
+                <thead>
+                    <tr style="background: #f8fafc;">
+                        <th style="font-family: 'Sora', sans-serif;">Job Position</th>
+                        <th style="font-family: 'Sora', sans-serif;">Company</th>
+                        <th style="font-family: 'Sora', sans-serif;">Alignment Score</th>
+                        <th style="font-family: 'Sora', sans-serif;">Match Tier</th>
+                        <th style="font-family: 'Sora', sans-serif;">Recorded On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in previous_matches %}
+                        <tr>
+                            <td style="font-weight: 700; color: #0f172a; font-family: 'Sora', sans-serif;">{{ match.job.title }}</td>
+                            <td style="color: #475569;">{{ match.job.company }}</td>
+                            <td>
+                                <span class="font-num" style="font-weight: 800; font-size: 1.15rem; color: {% if match.match_type == 'High' %}#059669{% elif match.match_type == 'Medium' %}#d97706{% else %}#e11d48{% endif %};">
+                                    {{ match.score|floatformat:0 }}%
+                                </span>
+                            </td>
+                            <td>
+                                <span class="score-badge-tier score-tier-{{ match.match_type|lower }}" style="font-family: 'Space Grotesk', sans-serif;">
+                                    {{ match.match_type }}
+                                </span>
+                            </td>
+                            <td style="color: #94a3b8; font-size: 0.85rem; font-family: 'Space Grotesk', sans-serif;">
+                                {{ match.created_at|date:"M d, Y"|default:"Recently" }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state-card" style="padding: 2.75rem 1rem;">
+                                    <div style="width: 56px; height: 56px; margin: 0 auto 1rem auto; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                                    </div>
+                                    <h4 class="empty-state-title font-display">No Historical Match Scores Recorded</h4>
+                                    <p class="empty-state-desc">Run a target job comparison above or sync your Gmail account to start logging compatibility history.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const progressBar = document.querySelector(".dashboard-progress-fill");
-        if (progressBar) {
-            progressBar.style.width = "0%";
-            setTimeout(() => {
-                progressBar.style.width = "{{ ats_score }}%";
-            }, 100);
-        }
-    });
+function handleJobSelectChange(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    if (selectedOption && selectedOption.value) {
+        const title = selectedOption.getAttribute('data-title') || '';
+        const desc = selectedOption.getAttribute('data-desc') || '';
+        document.getElementById('comparator-job-title').value = title;
+        document.getElementById('comparator-job-desc').value = desc;
+    }
+}
 </script>
 {% endblock %}

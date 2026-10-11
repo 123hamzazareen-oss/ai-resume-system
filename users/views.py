@@ -6,8 +6,16 @@ from django.contrib import messages
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from job_matcher.models import Job, MatchResult
+from resume_analyzer.models import Resume
+from resume_analyzer.utils import (
+    detect_domain,
+    calculate_ats_score,
+    get_missing_skills,
+    generate_suggestions
+)
 from users.services.match_engine import MatchEngine
 from .forms import RegisterForm, LoginForm
+
 # ---------------------------------------------------
 # HOME
 # ---------------------------------------------------
@@ -46,10 +54,27 @@ def get_match_level(score):
 @login_required
 def dashboard(request):
     # ---------------------------------------------------
-    # CHECK RESUME
+    # CHECK RESUME (WITH DATABASE FALLBACK FOR PERSISTENCE)
     # ---------------------------------------------------
     if 'resume_text' not in request.session:
-        return redirect('/resume/upload/')
+        latest_resume = Resume.objects.filter(user=request.user).order_by('-uploaded_at').first()
+        if latest_resume:
+            skills = [s.strip() for s in latest_resume.skills.split(",") if s.strip()]
+            domain = detect_domain(skills)
+            ats_score = latest_resume.ats_score if latest_resume.ats_score else calculate_ats_score(skills, domain)
+            missing_skills = get_missing_skills(skills, domain)
+            suggestions = generate_suggestions(skills, missing_skills, domain, ats_score)
+
+            request.session['resume_text'] = latest_resume.extracted_text
+            request.session['skills'] = skills
+            request.session['domain'] = domain
+            request.session['ats_score'] = ats_score
+            request.session['missing_skills'] = missing_skills
+            request.session['suggestions'] = suggestions
+            request.session['resume_id'] = latest_resume.id
+        else:
+            return redirect('/resume/upload/')
+
 
     resume_text = request.session.get(
         'resume_text',
@@ -383,18 +408,78 @@ def dashboard(request):
     jobs = jobs[:6]
 
     # ---------------------------------------------------
+    # TARGET JOB COMPARATOR (CUSTOM JD OR SELECTED JOB)
+    # ---------------------------------------------------
+    custom_match_result = None
+    if request.method == 'POST' and 'compare_job' in request.POST:
+        target_title = request.POST.get('target_job_title', '').strip()
+        target_desc = request.POST.get('target_job_description', '').strip()
+        selected_job_id = request.POST.get('selected_job_id', '').strip()
+
+        if selected_job_id:
+            db_job = Job.objects.filter(id=selected_job_id).first()
+            if db_job:
+                target_title = db_job.title
+                target_desc = db_job.description
+
+        if target_desc:
+            engine = MatchEngine(resume_text, skills, domain)
+            score, matched_skills_target = engine.compute_score(target_desc)
+            level = get_match_level(score)
+            missing_for_target = list(set(skills) - set(matched_skills_target))
+            custom_match_result = {
+                'title': target_title or 'Custom Target Position',
+                'description': target_desc,
+                'score': score,
+                'match_level': level,
+                'matched_skills': matched_skills_target,
+                'missing_skills': missing_for_target
+            }
+
+    # ---------------------------------------------------
+    # RECENT RESUMES & ACTIVE RESUME METRICS
+    # ---------------------------------------------------
+    recent_resumes = Resume.objects.filter(user=request.user).order_by('-uploaded_at')[:5]
+    active_resume = recent_resumes.first() if recent_resumes.exists() else None
+    available_jobs = Job.objects.all().order_by('-id')[:25]
+    domain_display = domain.replace('_', ' ').title() if domain else 'General Track'
+
+    # Score tier
+    if ats_score >= 75:
+        score_tier = "High"
+        score_verdict = "Optimized for Enterprise ATS"
+        score_color = "#10b981"
+    elif ats_score >= 45:
+        score_tier = "Medium"
+        score_verdict = "Good - Optimization Opportunities Available"
+        score_color = "#f59e0b"
+    else:
+        score_tier = "Low"
+        score_verdict = "Needs Strategic Skill Alignment"
+        score_color = "#f43f5e"
+
+    # ---------------------------------------------------
     # FINAL PAGE
     # ---------------------------------------------------
     return render(request, "users/dashboard.html", {
         "domain": domain,
-        "ats_score": ats_score,
+        "domain_display": domain_display,
+        "ats_score": int(ats_score),
+        "score_tier": score_tier,
+        "score_verdict": score_verdict,
+        "score_color": score_color,
         "skills": skills,
         "missing_skills": missing_skills,
         "suggestions": suggestions,
         "jobs": jobs,
         "gmail_connected": gmail_connected,
-        "previous_matches": previous_matches
+        "previous_matches": previous_matches,
+        "recent_resumes": recent_resumes,
+        "active_resume": active_resume,
+        "available_jobs": available_jobs,
+        "custom_match_result": custom_match_result
     })
+
 
 
 # ---------------------------------------------------

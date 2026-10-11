@@ -4,36 +4,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AI Resume System{% endblock %}</title>
+    <title>{% block title %}AI Resume &amp; Candidate Matching Platform{% endblock %}</title>
+    
+    <!-- Google Fonts Multi-Font System -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System Stylesheet -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar-custom">
-        <div class="navbar-container">
-            <a href="/" class="navbar-brand-custom">
-                <span>✦</span> AI Resume System
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="app-header-inner">
+            <a href="/" class="brand-wrapper">
+                <div class="brand-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-title">ResumeAI</span>
+                    <span class="brand-badge">Intelligent Matcher</span>
+                </div>
             </a>
-            <div class="navbar-menu">
-                <a href="/" class="nav-link-custom">Home</a>
+
+            <!-- Desktop Navigation -->
+            <nav class="nav-links-desktop">
+                <a href="/" class="nav-item-link {% if request.path == '/' %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Home</span>
+                </a>
                 {% if user.is_authenticated %}
-                    <a href="/dashboard/" class="nav-link-custom">Dashboard</a>
-                    <a href="/gmail/connect/" class="nav-link-custom">Connect Gmail</a>
-                    <a href="/logout/" class="btn-premium" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Logout</a>
+                    <a href="/dashboard/" class="nav-item-link {% if request.path == '/dashboard/' %}active{% endif %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/resume/upload/" class="nav-item-link {% if '/resume/upload/' in request.path %}active{% endif %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <span>Upload Resume</span>
+                    </a>
+                    <a href="/resume/result/" class="nav-item-link {% if '/resume/result/' in request.path %}active{% endif %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                        <span>ATS Report</span>
+                    </a>
+                    <a href="/jobs/" class="nav-item-link {% if request.path == '/jobs/' %}active{% endif %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                        <span>Job Matches</span>
+                    </a>
+                    
+                    <div style="height: 20px; width: 1px; background: var(--border-color); margin: 0 0.35rem;"></div>
+
+                    <div class="nav-user-pill">
+                        <div class="nav-user-avatar">
+                            {{ user.username|make_list|first|upper }}
+                        </div>
+                        <span>{{ user.username }}</span>
+                    </div>
+                    <a href="/logout/" class="btn-signout-nav" title="Sign Out">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                        <span>Sign Out</span>
+                    </a>
                 {% else %}
-                    <a href="/login/" class="nav-link-custom">Login</a>
-                    <a href="/register/" class="btn-premium" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Register</a>
+                    <a href="/login/" class="nav-item-link {% if request.path == '/login/' %}active{% endif %}">
+                        Sign In
+                    </a>
+                    <a href="/register/" class="btn-saas-primary" style="padding: 0.55rem 1.25rem; font-size: 0.88rem;">
+                        Get Started Free &rarr;
+                    </a>
                 {% endif %}
+            </nav>
+
+            <!-- Mobile Hamburger Button -->
+            <button class="nav-mobile-btn" id="mobile-nav-toggle" aria-label="Toggle navigation menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+            <a href="/" class="nav-item-link {% if request.path == '/' %}active{% endif %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span>Home</span>
+            </a>
+            {% if user.is_authenticated %}
+                <a href="/dashboard/" class="nav-item-link {% if request.path == '/dashboard/' %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3"/><rect width="7" height="5" x="14" y="3"/><rect width="7" height="9" x="14" y="12"/><rect width="7" height="5" x="3" y="16"/></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/resume/upload/" class="nav-item-link {% if '/resume/upload/' in request.path %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                    <span>Upload Resume</span>
+                </a>
+                <a href="/resume/result/" class="nav-item-link {% if '/resume/result/' in request.path %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>ATS Report</span>
+                </a>
+                <a href="/jobs/" class="nav-item-link {% if request.path == '/jobs/' %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <span>Job Matches</span>
+                </a>
+                <a href="/gmail/connect/" class="nav-item-link {% if '/gmail/' in request.path %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <span>Connect Gmail</span>
+                </a>
+                <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Logged in as <strong>{{ user.username }}</strong></span>
+                    <a href="/logout/" class="btn-signout-nav" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;">Sign Out</a>
+                </div>
+            {% else %}
+                <a href="/login/" class="nav-item-link">Sign In</a>
+                <a href="/register/" class="btn-saas-primary" style="justify-content: center; margin-top: 0.5rem;">Create Account</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Global Flash Messages Notification Banner -->
+    {% if messages %}
+        <div class="alerts-wrapper">
+            {% for message in messages %}
+                <div class="alert-item {% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <span>
+                            {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% else %}ℹ{% endif %}
+                        </span>
+                        <span>{{ message }}</span>
+                    </div>
+                    <button class="alert-close" onclick="this.parentElement.remove();">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content Injection -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="saas-container" style="padding-top: 0; padding-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                <div style="text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                        <span style="color: var(--teal-600); font-weight: 800;">✦</span>
+                        <strong style="color: var(--text-primary); font-family: 'Outfit', sans-serif;">ResumeAI Candidate Matching Platform</strong>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                        Natural Language Processing &bull; Scikit-Learn TF-IDF Cosine Matcher &bull; PyMuPDF Resume Parser &bull; Gmail API
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1.5rem; font-size: 0.88rem;">
+                    <a href="/dashboard/" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
+                    <a href="/resume/upload/" style="color: var(--text-muted); text-decoration: none;">Resume Upload</a>
+                    <a href="/jobs/" style="color: var(--text-muted); text-decoration: none;">Job Matches</a>
+                </div>
+            </div>
+            <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem; font-size: 0.82rem; color: var(--text-light); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <span>&copy; 2026 ResumeAI &bull; Candidate Job Matcher</span>
+                <span>User-Friendly &bull; Accessible &bull; Enterprise-Ready</span>
             </div>
         </div>
-    </nav>
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-    <footer class="footer-custom">
-        <div class="container">
-            <p>&copy; 2026 AI Resume System. Elevate your career with AI-powered matching.</p>
-        </div>
     </footer>
+
+    <!-- Mobile Navigation Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('mobile-nav-toggle');
+            const drawer = document.getElementById('mobile-nav-drawer');
+            if (toggleBtn && drawer) {
+                toggleBtn.addEventListener('click', function() {
+                    drawer.classList.toggle('open');
+                });
+            }
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

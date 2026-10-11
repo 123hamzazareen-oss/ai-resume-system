@@ -1,20 +1,168 @@
 {% extends 'base.html' %}
 
+{% block title %}Job Matches &amp; Candidate Alignment - ResumeAI{% endblock %}
+
 {% block content %}
-
-<h2>Job Matches</h2>
-{% if error %}
-    <p style="color:red;">{{ error }}</p>
-{% endif %}
-
-{% for item in results %}
-    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-        <h3>{{ item.job.title }}</h3>
-        <p><strong>Company:</strong> {{ item.job.company }}</p>
-        <p><strong>Match Score:</strong> {{ item.score }}%</p>
-        <p><strong>Status:</strong> {{ item.match_type }}</p>
+<div class="saas-container">
+    <!-- Top Breadcrumbs & Actions -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-muted); font-family: 'Space Grotesk', sans-serif;">
+            <a href="/dashboard/" style="color: var(--teal-600); text-decoration: none; font-weight: 600;">Dashboard</a>
+            <span>&rsaquo;</span>
+            <span style="color: var(--text-primary); font-weight: 700;">Job Matches</span>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="/resume/upload/" class="btn-saas-secondary" style="padding: 0.45rem 1rem; font-size: 0.85rem; font-family: 'Sora', sans-serif; font-weight: 600;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Re-upload Resume
+            </a>
+            <a href="/dashboard/" class="btn-saas-primary" style="padding: 0.45rem 1.15rem; font-size: 0.85rem; font-family: 'Sora', sans-serif; font-weight: 700;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Dashboard
+            </a>
+        </div>
     </div>
-{% endfor %}
 
-<a href="/dashboard/">Back</a>
+    <!-- Page Header Bar -->
+    <div class="page-header-bar" style="margin-bottom: 2rem;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: #f0fdfa; border: 1px solid #99f6e4; color: #0f766e; padding: 0.28rem 0.85rem; border-radius: var(--radius-full); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.65rem; font-family: 'Space Grotesk', sans-serif;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Automated Role Evaluation
+            </div>
+            <h1 class="page-title font-display" style="font-size: 2.2rem; margin-bottom: 0.45rem;">
+                Compatible Job Matches
+            </h1>
+            <p class="page-subtitle" style="font-size: 0.98rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                Evaluating candidate competencies against database job listings using mathematical TF-IDF cosine skill matching.
+            </p>
+        </div>
+
+        <!-- Active Resume Badge -->
+        {% if resume %}
+            <div style="background: #ffffff; border: 1px solid #c7d2fe; padding: 0.85rem 1.4rem; border-radius: var(--radius-lg); text-align: right; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.06);">
+                <div style="font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 700; font-family: 'Space Grotesk', sans-serif;">Active Resume</div>
+                <strong style="color: #0f172a; font-size: 0.96rem; font-family: 'Sora', sans-serif;">{{ resume.file.name|slice:"8:" }}</strong>
+                <div style="font-size: 0.84rem; color: #059669; font-weight: 800; font-family: 'Space Grotesk', sans-serif;">{{ resume.ats_score|floatformat:0 }}% ATS Baseline</div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if error %}
+        <div class="alert-item error" style="margin-bottom: 2rem; border-radius: var(--radius-md);">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <span style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ error }}</span>
+            </div>
+            <a href="/resume/upload/" class="btn-saas-primary" style="padding: 0.35rem 0.85rem; font-size: 0.82rem; font-family: 'Sora', sans-serif;">Upload Resume</a>
+        </div>
+    {% else %}
+
+        <!-- Filter & Search Controls Card -->
+        <div class="card-saas" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-xl);">
+            <form method="GET" action="/jobs/" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <!-- Search Input -->
+                <div style="flex: 1; min-width: 260px;">
+                    <input type="text" name="q" value="{{ query|default:'' }}" class="form-control" placeholder="Search by role title, company, or skill keywords..." style="border-radius: var(--radius-full); padding: 0.6rem 1.25rem;">
+                </div>
+
+                <!-- Tier Filter Tabs -->
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="/jobs/{% if query %}?q={{ query }}{% endif %}" class="btn-saas-secondary" style="padding: 0.5rem 0.95rem; font-size: 0.82rem; border-radius: var(--radius-full); font-family: 'Space Grotesk', sans-serif; {% if not filter_tier %}border-color: var(--teal-600); background: #f0fdfa; color: #0f766e !important; font-weight: 700;{% endif %}">
+                        All ({{ total_count }})
+                    </a>
+                    <a href="/jobs/?tier=high{% if query %}&q={{ query }}{% endif %}" class="btn-saas-secondary" style="padding: 0.5rem 0.95rem; font-size: 0.82rem; border-radius: var(--radius-full); font-family: 'Space Grotesk', sans-serif; {% if filter_tier == 'high' %}border-color: #34d399; background: #ecfdf5; color: #047857 !important; font-weight: 700;{% endif %}">
+                        High Matches ({{ high_count }})
+                    </a>
+                    <a href="/jobs/?tier=medium{% if query %}&q={{ query }}{% endif %}" class="btn-saas-secondary" style="padding: 0.5rem 0.95rem; font-size: 0.82rem; border-radius: var(--radius-full); font-family: 'Space Grotesk', sans-serif; {% if filter_tier == 'medium' %}border-color: #fde68a; background: #fffbeb; color: #b45309 !important; font-weight: 700;{% endif %}">
+                        Medium ({{ medium_count }})
+                    </a>
+                    <a href="/jobs/?tier=low{% if query %}&q={{ query }}{% endif %}" class="btn-saas-secondary" style="padding: 0.5rem 0.95rem; font-size: 0.82rem; border-radius: var(--radius-full); font-family: 'Space Grotesk', sans-serif; {% if filter_tier == 'low' %}border-color: #fecdd3; background: #fff1f2; color: #be123c !important; font-weight: 700;{% endif %}">
+                        Low ({{ low_count }})
+                    </a>
+
+                    <button type="submit" class="btn-saas-primary" style="padding: 0.55rem 1.25rem; font-size: 0.85rem; border-radius: var(--radius-full); font-family: 'Sora', sans-serif; font-weight: 700;">
+                        Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Job Cards Grid -->
+        {% if results %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+                {% for item in results %}
+                    <div class="card-saas" style="margin-bottom: 0; padding: 1.85rem; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--radius-xl); border-left: 5px solid {% if item.match_type == 'High' %}#10b981{% elif item.match_type == 'Medium' %}#f59e0b{% else %}#f43f5e{% endif %}; background: {% if item.match_type == 'High' %}linear-gradient(180deg, #f0fdf4 0%, #ffffff 40%){% elif item.match_type == 'Medium' %}linear-gradient(180deg, #fffbeb 0%, #ffffff 40%){% else %}linear-gradient(180deg, #fff1f2 0%, #ffffff 40%){% endif %};">
+                        <div>
+                            <!-- Card Header -->
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.85rem;">
+                                <div>
+                                    <h3 class="font-display" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0 0 0.35rem 0; line-height: 1.3;">
+                                        {{ item.job.title }}
+                                    </h3>
+                                    <div style="font-size: 0.92rem; color: #0f766e; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg>
+                                        {{ item.job.company }}
+                                    </div>
+                                </div>
+
+                                <div style="text-align: right; min-width: 80px;">
+                                    <div class="font-num" style="font-size: 2rem; font-weight: 800; color: {% if item.match_type == 'High' %}#059669{% elif item.match_type == 'Medium' %}#d97706{% else %}#e11d48{% endif %}; line-height: 1;">
+                                        {{ item.score|floatformat:0 }}%
+                                    </div>
+                                    <span class="score-badge-tier score-tier-{{ item.match_type|lower }}" style="margin-top: 0.35rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; padding: 0.2rem 0.6rem;">
+                                        {{ item.match_type }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Job Description Snippet -->
+                            <p style="color: #475569; font-size: 0.92rem; line-height: 1.55; margin-bottom: 1.25rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                {{ item.job.description|truncatechars:180 }}
+                            </p>
+
+                            <!-- Matched Skills -->
+                            {% if item.matched_skills %}
+                                <div style="margin-bottom: 1.25rem;">
+                                    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 0.45rem; letter-spacing: 0.06em;">
+                                        Matching Skills ({{ item.matched_skills|length }}):
+                                    </div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                                        {% for skill in item.matched_skills %}
+                                            <span class="chip-skill-colored chip-tag-frontend" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">
+                                                {{ skill }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div style="border-top: 1px solid rgba(15, 23, 42, 0.08); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                            <span style="font-size: 0.78rem; color: #94a3b8; font-family: 'Space Grotesk', sans-serif;">
+                                Position #{{ item.job.id }}
+                            </span>
+                            <a href="/dashboard/#job-comparator-section" class="btn-saas-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.82rem; border-radius: var(--radius-full); font-family: 'Sora', sans-serif; font-weight: 600;">
+                                Compare in Dashboard &rarr;
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card-saas" style="border-radius: var(--radius-xl);">
+                <div class="empty-state-card" style="padding: 3rem 1.5rem;">
+                    <div style="width: 56px; height: 56px; margin: 0 auto 1rem auto; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
+                    <h4 class="empty-state-title font-display">No Jobs Match Your Filter</h4>
+                    <p class="empty-state-desc" style="font-family: 'Plus Jakarta Sans', sans-serif;">Try clearing your search terms or selecting "All" to view all available positions.</p>
+                    <a href="/jobs/" class="btn-saas-primary" style="font-size: 0.88rem; font-family: 'Sora', sans-serif;">Clear Filters</a>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
 {% endblock %}
+

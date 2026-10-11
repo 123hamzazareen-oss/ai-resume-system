@@ -1,29 +1,70 @@
 {% extends 'base.html' %}
 
+{% block title %}Scanned Job Emails - ResumeAI{% endblock %}
+
 {% block content %}
-
-<h2>Job Emails</h2>
-{% for email in emails %}
-    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-        <p><strong>From:</strong> {{ email.sender }}</p>
-        <p><strong>Subject:</strong> {{ email.subject }}</p>
-        <p><strong>Company:</strong> {{ email.company }}</p>
-        <p><strong>Match Score:</strong> {{ email.match_score }}%</p>
-        {% if email.match_level == "High Match" %}
-            <p style="color:green;"><strong> High Match</strong></p>
-        {% elif email.match_level == "Medium Match" %}
-            <p style="color:orange;"><strong> Medium Match</strong></p>
-        {% else %}
-            <p style="color:red;"><strong> Low Match</strong></p>
-        {% endif %}
-
-        {% if email.is_job %}
-            <p style="color:green;"><strong>✔ Job Related</strong></p>
-        {% else %}
-            <p style="color:red;">Not Job</p>
-        {% endif %}
+<div class="saas-container">
+    <div class="page-header-bar" style="margin-bottom: 2rem;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: var(--teal-50); border: 1px solid var(--teal-100); color: var(--teal-700); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem;">
+                <span>📬</span> Gmail Digest Sync
+            </div>
+            <h1 class="page-title">
+                Scanned Job Emails
+            </h1>
+            <p class="page-subtitle">
+                Incoming notifications detected and analyzed from your connected Google account.
+            </p>
+        </div>
+        <a href="/dashboard/" class="btn-saas-secondary" style="font-size: 0.88rem;">
+            &larr; Back to Dashboard
+        </a>
     </div>
-{% empty %}
-    <p>No job emails found.</p>
-{% endfor %}
+
+    {% if emails %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+            {% for email in emails %}
+                <div class="card-saas" style="margin-bottom: 0; padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem;">
+                            <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0; line-height: 1.3;">
+                                {{ email.subject }}
+                            </h4>
+                            <span style="font-size: 1.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--teal-700);">
+                                {{ email.match_score }}%
+                            </span>
+                        </div>
+
+                        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.5rem;">
+                            <strong>Company:</strong> {{ email.company }}
+                        </p>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                            <strong>From:</strong> {{ email.sender }}
+                        </p>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+                        <span class="score-badge-tier {% if 'High' in email.match_level %}score-tier-high{% elif 'Medium' in email.match_level %}score-tier-medium{% else %}score-tier-low{% endif %}">
+                            {{ email.match_level }}
+                        </span>
+                        {% if email.is_job %}
+                            <span style="font-size: 0.8rem; color: var(--primary-700); font-weight: 700;">✔ Job Related</span>
+                        {% else %}
+                            <span style="font-size: 0.8rem; color: var(--text-light);">Other Notification</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card-saas">
+            <div class="empty-state-card">
+                <div class="empty-state-icon">📬</div>
+                <h4 class="empty-state-title">No Job Emails Found</h4>
+                <p class="empty-state-desc">We did not find any active job notifications matching your career track in your recent messages.</p>
+                <a href="/dashboard/" class="btn-saas-primary" style="font-size: 0.88rem;">Back to Dashboard</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

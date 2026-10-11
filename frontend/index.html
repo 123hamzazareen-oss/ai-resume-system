@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI - Smart Resume Analyzer & Job Match Platform</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           DESIGN SYSTEM & CSS VARIABLES
+           ========================================================================== */
+        :root {
+            --primary-50: #f0fdf4;
+            --primary-100: #dcfce7;
+            --primary-200: #bbf7d0;
+            --primary-500: #10b981;
+            --primary-600: #059669;
+            --primary-700: #047857;
+            --primary-800: #065f46;
+            
+            --teal-50: #f0fdfa;
+            --teal-100: #ccfbf1;
+            --teal-500: #14b8a6;
+            --teal-600: #0d9488;
+            --teal-700: #0f766e;
+            --teal-800: #115e59;
+
+            --accent-amber: #f59e0b;
+            --accent-amber-light: #fffbeb;
+            --accent-amber-dark: #b45309;
+
+            --accent-sky: #0284c7;
+            --accent-sky-light: #f0f9ff;
+            
+            --accent-rose: #e11d48;
+            --accent-rose-light: #fff1f2;
+            --accent-rose-dark: #be123c;
+
+            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+            --primary-gradient-hover: linear-gradient(135deg, #0f766e 0%, #047857 100%);
+
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --border-color: #e2e8f0;
+            --border-subtle: #edf2f7;
+
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+
+            --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+            --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.07);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
+            --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.09);
+            --shadow-teal: 0 10px 20px -3px rgba(13, 148, 136, 0.25);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            --transition-fast: all 0.15s ease;
+            --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Reset & Base */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-secondary);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        a {
+            color: var(--teal-600);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+
+        .saas-container {
+            width: 92%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 0 4rem 0;
+        }
+
+        /* Header Navigation */
+        .app-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+        }
+
+        .app-header-inner {
+            width: 92%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem 0;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .brand-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(13, 148, 136, 0.3);
+        }
+
+        .brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            display: block;
+            line-height: 1.1;
+        }
+
+        .brand-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--teal-700);
+            background: var(--teal-50);
+            border: 1px solid var(--teal-100);
+            padding: 0.15rem 0.5rem;
+            border-radius: var(--radius-full);
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        .nav-links-desktop {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+
+        .nav-item-link:hover {
+            color: var(--teal-700);
+        }
+
+        .nav-item-link.active {
+            color: var(--teal-700);
+            background-color: var(--teal-50);
+            border: 1px solid var(--teal-100);
+            border-radius: var(--radius-full);
+            padding: 0.4rem 0.9rem;
+        }
+
+        .btn-saas-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.35rem;
+            border-radius: var(--radius-full);
+            background: var(--primary-gradient);
+            color: #ffffff !important;
+            font-weight: 600;
+            font-size: 0.92rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-fast);
+        }
+
+        .btn-saas-primary:hover {
+            background: var(--primary-gradient-hover);
+            box-shadow: var(--shadow-teal);
+            transform: translateY(-1px);
+        }
+
+        .btn-saas-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.35rem;
+            border-radius: var(--radius-full);
+            background: #ffffff;
+            color: var(--text-secondary) !important;
+            font-weight: 600;
+            font-size: 0.92rem;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: var(--shadow-xs);
+            transition: var(--transition-fast);
+        }
+
+        .btn-saas-secondary:hover {
+            background: var(--bg-subtle);
+            border-color: #cbd5e1;
+            color: var(--text-primary) !important;
+            transform: translateY(-1px);
+        }
+
+        .nav-mobile-btn {
+            display: none;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.45rem 0.75rem;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .mobile-nav-drawer {
+            display: none;
+            flex-direction: column;
+            padding: 1rem 1.5rem;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            gap: 0.75rem;
+        }
+
+        .mobile-nav-drawer.open {
+            display: flex;
+        }
+
+        @media (max-width: 900px) {
+            .nav-links-desktop {
+                display: none;
+            }
+            .nav-mobile-btn {
+                display: block;
+            }
+        }
+
+        /* Hero Section */
+        .hero-section-clean {
+            padding: 4rem 0 3.5rem 0;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 3.5rem;
+            align-items: center;
+        }
+
+        @media (max-width: 960px) {
+            .hero-section-clean {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+                text-align: center;
+            }
+        }
+
+        .hero-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--teal-50);
+            border: 1px solid var(--teal-100);
+            color: var(--teal-700);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--radius-full);
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-title-clean {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-title-highlight {
+            color: #0d9488;
+            background: linear-gradient(135deg, #0d9488 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle-clean {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 580px;
+        }
+
+        @media (max-width: 960px) {
+            .hero-subtitle-clean {
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        .hero-buttons-group {
+            display: flex;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 960px) {
+            .hero-buttons-group {
+                justify-content: center;
+            }
+        }
+
+        .checklist-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        @media (max-width: 960px) {
+            .checklist-row {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .checklist-item span {
+            color: var(--teal-600);
+            font-weight: 800;
+        }
+
+        /* Live Resume Card Preview */
+        .hero-card-preview {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            transition: var(--transition-smooth);
+        }
+
+        .hero-card-preview:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 35px -5px rgba(15, 23, 42, 0.1);
+        }
+
+        .card-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 1rem;
+        }
+
+        .file-meta-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: left;
+        }
+
+        .file-icon {
+            font-size: 1.6rem;
+        }
+
+        .file-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.98rem;
+            display: block;
+        }
+
+        .file-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .ats-circle-badge {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: #e6f9f0;
+            border: 1px solid #bbf7d0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .ats-circle-score {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--primary-700);
+            line-height: 1;
+        }
+
+        .ats-circle-label {
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary-700);
+            letter-spacing: 0.04em;
+            margin-top: 2px;
+        }
+
+        .competencies-section {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .competencies-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.05em;
+        }
+
+        .skill-tags-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chip-skill-detected {
+            background: var(--teal-50);
+            border: 1px solid var(--teal-100);
+            color: var(--teal-800);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-full);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: var(--transition-fast);
+        }
+
+        .chip-skill-detected:hover {
+            background: var(--teal-100);
+            border-color: var(--teal-500);
+        }
+
+        .job-opportunity-card {
+            background: var(--bg-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+
+        .job-card-title-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .job-card-role {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .job-card-company {
+            font-size: 0.8rem;
+            color: var(--teal-600);
+            font-weight: 600;
+        }
+
+        .job-card-score {
+            text-align: right;
+        }
+
+        .job-score-pct {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--teal-700);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1;
+            display: block;
+        }
+
+        .job-score-badge {
+            font-size: 0.72rem;
+            color: var(--teal-600);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        /* Metrics Bar */
+        .metrics-bar-clean {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            padding: 2.25rem;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin: 3.5rem 0;
+        }
+
+        @media (max-width: 900px) {
+            .metrics-bar-clean {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .metrics-bar-clean {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-item-clean {
+            text-align: center;
+            border-right: 1px solid var(--border-subtle);
+        }
+
+        .metric-item-clean:last-child {
+            border-right: none;
+        }
+
+        .metric-number-clean {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--teal-700);
+            line-height: 1.2;
+        }
+
+        .metric-label-clean {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* Interactive Simulator */
+        .section-center-head {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .section-center-head h2 {
+            font-size: 2.35rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-center-head p {
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        .simulator-container-clean {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            margin: 2rem 0 5rem 0;
+        }
+
+        .simulator-header {
+            background: var(--bg-subtle);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .simulator-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        @media (max-width: 860px) {
+            .simulator-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulator-pane-left {
+            padding: 2.25rem;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .simulator-pane-right {
+            padding: 2.25rem;
+            background: var(--teal-50);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 380px;
+        }
+
+        .form-select-custom {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .form-select-custom:focus {
+            border-color: var(--teal-600);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+
+        .interactive-tag {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.45rem 0.9rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            user-select: none;
+        }
+
+        .interactive-tag:hover {
+            border-color: var(--teal-600);
+            color: var(--teal-700);
+            background: var(--teal-50);
+        }
+
+        .interactive-tag.active {
+            background: var(--teal-600);
+            border-color: var(--teal-600);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
+        }
+
+        .chip-skill-missing {
+            background: var(--accent-rose-light);
+            border: 1px solid #fecdd3;
+            color: var(--accent-rose-dark);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-full);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .spinner-pulse {
+            border: 3px solid rgba(13, 148, 136, 0.2);
+            border-top-color: var(--teal-600);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Feature Grid */
+        .features-grid-clean {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0 5rem 0;
+        }
+
+        .feature-card-clean {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-card-clean:hover {
+            transform: translateY(-4px);
+            border-color: var(--teal-500);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Workflow Steps */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2.5rem 0 5rem 0;
+        }
+
+        @media (max-width: 860px) {
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .step-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .step-number-pill {
+            display: inline-block;
+            width: 38px;
+            height: 38px;
+            line-height: 38px;
+            background: var(--teal-50);
+            color: var(--teal-700);
+            font-weight: 800;
+            font-size: 1rem;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            border: 1px solid var(--teal-100);
+        }
+
+        /* Bottom CTA Banner */
+        .cta-banner-clean {
+            background: linear-gradient(135deg, var(--teal-700) 0%, var(--primary-700) 100%);
+            border-radius: var(--radius-xl);
+            padding: 3.5rem 2.5rem;
+            color: #ffffff;
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+            margin: 2rem 0 4rem 0;
+        }
+
+        .cta-banner-clean h2 {
+            color: #ffffff;
+            font-size: 2.35rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .cta-banner-clean p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+        }
+
+        /* Footer */
+        .footer-custom {
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            padding: 2.5rem 0 1.5rem 0;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="app-header-inner">
+            <a href="#" class="brand-wrapper">
+                <div class="brand-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="brand-title">ResumeAI</span>
+                    <span class="brand-badge">INTELLIGENT MATCHER</span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="nav-links-desktop">
+                <a href="#" class="nav-item-link active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Home</span>
+                </a>
+                <a href="#demo" class="nav-item-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    <span>Simulation</span>
+                </a>
+                <a href="#features" class="nav-item-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    <span>Features</span>
+                </a>
+                <a href="#workflow" class="nav-item-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    <span>How it Works</span>
+                </a>
+                <a href="#" class="nav-item-link">
+                    Sign In
+                </a>
+                <a href="#demo" class="btn-saas-primary">
+                    Get Started Free &rarr;
+                </a>
+            </nav>
+
+            <!-- Mobile Hamburger Button -->
+            <button class="nav-mobile-btn" id="mobile-nav-toggle" aria-label="Toggle navigation menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+            <a href="#" class="nav-item-link active">Home</a>
+            <a href="#demo" class="nav-item-link">Simulation</a>
+            <a href="#features" class="nav-item-link">Features</a>
+            <a href="#workflow" class="nav-item-link">How it Works</a>
+            <a href="#" class="nav-item-link">Sign In</a>
+            <a href="#demo" class="btn-saas-primary" style="justify-content: center; margin-top: 0.5rem;">Get Started Free &rarr;</a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main>
+        <div class="saas-container">
+            <!-- Hero Section -->
+            <section class="hero-section-clean">
+                <!-- Left Hero Column -->
+                <div>
+                    <div class="hero-pill-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                        </svg>
+                        INTELLIGENT MATCHER
+                    </div>
+                    <h1 class="hero-title-clean">
+                        Land Better Interviews with <br>
+                        <span class="hero-title-highlight">Intelligent ATS Matching</span>
+                    </h1>
+                    <p class="hero-subtitle-clean">
+                        Upload your resume, pinpoint missing keywords, and automatically discover high-compatibility job alerts scanned from your Gmail inbox.
+                    </p>
+                    <div class="hero-buttons-group">
+                        <a href="#demo" class="btn-saas-primary" style="padding: 0.85rem 1.75rem; font-size: 1rem;">
+                            Get Started Free &rarr;
+                        </a>
+                        <a href="#" class="btn-saas-secondary" style="padding: 0.85rem 1.75rem; font-size: 1rem;">
+                            Sign In to Account
+                        </a>
+                    </div>
+                    
+                    <div class="checklist-row">
+                        <div class="checklist-item">
+                            <span>✓</span> PDF &amp; Word Support
+                        </div>
+                        <div class="checklist-item">
+                            <span>✓</span> Instant ATS Scoring
+                        </div>
+                        <div class="checklist-item">
+                            <span>✓</span> 100% Free
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Hero Column: Resume Card Mockup -->
+                <div>
+                    <div class="hero-card-preview">
+                        <div class="card-preview-header">
+                            <div class="file-meta-group">
+                                <div style="width: 38px; height: 38px; border-radius: 8px; background: var(--teal-50); display: flex; align-items: center; justify-content: center; color: var(--teal-600);">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                </div>
+                                <div>
+                                    <strong class="file-name">Software_Engineer_Resume.pdf</strong>
+                                    <span class="file-desc">Analyzed with PyMuPDF Parser</span>
+                                </div>
+                            </div>
+                            <div class="ats-circle-badge">
+                                <span class="ats-circle-score">92%</span>
+                                <span class="ats-circle-label">ATS SCORE</span>
+                            </div>
+                        </div>
+
+                        <div class="competencies-section">
+                            <div class="competencies-title">
+                                EXTRACTED CORE COMPETENCIES:
+                            </div>
+                            <div class="skill-tags-group">
+                                <span class="chip-skill-detected">Python</span>
+                                <span class="chip-skill-detected">Django</span>
+                                <span class="chip-skill-detected">React</span>
+                                <span class="chip-skill-detected">PostgreSQL</span>
+                                <span class="chip-skill-detected">TF-IDF Vectorization</span>
+                                <span class="chip-skill-detected">RESTful APIs</span>
+                            </div>
+                        </div>
+
+                        <div class="job-opportunity-card">
+                            <div>
+                                <div class="job-card-title-sub">Top Matched Opportunity</div>
+                                <strong class="job-card-role">Senior Backend Developer</strong>
+                                <div class="job-card-company">Stripe &bull; Remote</div>
+                            </div>
+                            <div class="job-card-score">
+                                <span class="job-score-pct">95%</span>
+                                <span class="job-score-badge">EXCELLENT FIT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Metrics Bar -->
+            <section class="metrics-bar-clean">
+                <div class="metric-item-clean">
+                    <div class="metric-number-clean">98%</div>
+                    <div class="metric-label-clean">ATS Skill Parsing Accuracy</div>
+                </div>
+                <div class="metric-item-clean">
+                    <div class="metric-number-clean">&lt;0.2s</div>
+                    <div class="metric-label-clean">Similarity Engine Speed</div>
+                </div>
+                <div class="metric-item-clean">
+                    <div class="metric-number-clean">100%</div>
+                    <div class="metric-label-clean">Secure OAuth 2.0 Integration</div>
+                </div>
+                <div class="metric-item-clean">
+                    <div class="metric-number-clean">4 Core</div>
+                    <div class="metric-label-clean">Tech Domains Evaluated</div>
+                </div>
+            </section>
+
+            <!-- Interactive Simulator Section -->
+            <section id="demo">
+                <div class="section-center-head">
+                    <span class="hero-pill-badge">INTERACTIVE DEMO</span>
+                    <h2>Test the AI Match Engine</h2>
+                    <p>
+                        Select your target career path and toggle skills below to preview how our Scikit-Learn TF-IDF model scores candidate profiles.
+                    </p>
+                </div>
+
+                <div class="simulator-container-clean">
+                    <div class="simulator-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--teal-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            <span style="font-weight: 700; color: var(--text-primary);">Candidate Score Sandbox</span>
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); background: #ffffff; padding: 0.25rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-weight: 600;">
+                            Live Simulation
+                        </span>
+                    </div>
+
+                    <div class="simulator-body">
+                        <!-- Left Controls -->
+                        <div class="simulator-pane-left">
+                            <div style="margin-bottom: 1.5rem;">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem;">
+                                    TARGET CAREER TRACK
+                                </label>
+                                <select id="sim-domain" class="form-select-custom" onchange="updateSimDomain()">
+                                    <option value="web_development">Web Development (Full Stack)</option>
+                                    <option value="python_development">Python Backend Engineering</option>
+                                    <option value="machine_learning">Machine Learning &amp; AI</option>
+                                    <option value="data_analyst">Data Analytics &amp; SQL</option>
+                                </select>
+                            </div>
+
+                            <div style="margin-bottom: 1.75rem;">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem;">
+                                    TOGGLE YOUR CANDIDATE SKILLS:
+                                </label>
+                                <div id="sim-skills-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    <!-- Populated dynamically by JavaScript -->
+                                </div>
+                            </div>
+
+                            <button class="btn-saas-primary" onclick="triggerSimulatorScan()" style="width: 100%; justify-content: center; padding: 0.85rem 0; font-size: 0.95rem;">
+                                Calculate Profile Match &rarr;
+                            </button>
+                        </div>
+
+                        <!-- Right Results Pane -->
+                        <div class="simulator-pane-right">
+                            <!-- Initial Prompt Placeholder -->
+                            <div id="sim-initial-placeholder" style="padding: 2rem 1rem;">
+                                <div style="width: 64px; height: 64px; margin: 0 auto 1rem auto; border-radius: 50%; background: #ffffff; border: 2px solid var(--teal-200); display: flex; align-items: center; justify-content: center; color: var(--teal-600); box-shadow: var(--shadow-sm);">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                </div>
+                                <h4 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">Click Skills to Test</h4>
+                                <p style="color: var(--text-muted); font-size: 0.92rem; max-width: 320px; margin: 0 auto;">
+                                    Select active competencies on the left pane and calculate your match score.
+                                </p>
+                            </div>
+
+                            <!-- Loader Animation -->
+                            <div id="sim-loader" style="display: none; padding: 2.5rem 1rem;">
+                                <div class="spinner-pulse" style="width: 44px; height: 44px; margin-bottom: 1rem;"></div>
+                                <p style="font-weight: 600; color: var(--teal-700); margin: 0;">Evaluating skill density...</p>
+                            </div>
+
+                            <!-- Live Result Output -->
+                            <div id="sim-result" style="display: none; width: 100%; animation: fadeIn 0.3s ease;">
+                                <div style="width: 110px; height: 110px; border-radius: 50%; background: #ffffff; border: 4px solid var(--teal-600); margin: 0 auto 1rem auto; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+                                    <span id="sim-score-text" style="font-size: 2.1rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: var(--teal-700); line-height: 1;">0%</span>
+                                    <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.04em;">ALIGNMENT</span>
+                                </div>
+
+                                <h4 id="sim-score-verdict" style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.35rem;">High Compatibility — Strong Match</h4>
+                                <p id="sim-score-desc" style="color: var(--text-muted); font-size: 0.88rem; max-width: 360px; margin: 0 auto 1.25rem auto;">
+                                    Strong skill coverage for standard job requisitions in this career path.
+                                </p>
+
+                                <div style="background: #ffffff; border-radius: var(--radius-md); padding: 1.1rem; border: 1px solid var(--border-color); text-align: left;">
+                                    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent-rose-dark); font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 0.05em;">
+                                        RECOMMENDED SKILL ADDITIONS:
+                                    </div>
+                                    <div id="sim-missing-skills" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                                        <!-- Missing skill chips inserted dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Grid Section -->
+            <section id="features">
+                <div class="section-center-head">
+                    <span class="hero-pill-badge">CORE CAPABILITIES</span>
+                    <h2>Built for Modern Job Seekers</h2>
+                    <p>
+                        A complete suite of NLP and automation tools to simplify your job application workflow.
+                    </p>
+                </div>
+
+                <div class="features-grid-clean">
+                    <div class="feature-card-clean">
+                        <div class="feature-icon-box" style="background: var(--teal-50); color: var(--teal-700);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">PyMuPDF Resume Parsing</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                            High-fidelity text extraction from both PDF and Word documents without losing formatting or skill keywords.
+                        </p>
+                    </div>
+
+                    <div class="feature-card-clean">
+                        <div class="feature-icon-box" style="background: var(--primary-50); color: var(--primary-700);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        </div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Scikit-Learn TF-IDF</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                            Calculates mathematical cosine similarity between your resume text and target job specifications with high accuracy.
+                        </p>
+                    </div>
+
+                    <div class="feature-card-clean">
+                        <div class="feature-icon-box" style="background: var(--accent-amber-light); color: var(--accent-amber-dark);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        </div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Automated Gmail Sync</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                            Securely reads incoming job alert digests from LinkedIn, Indeed, and Glassdoor using read-only Google OAuth 2.0.
+                        </p>
+                    </div>
+
+                    <div class="feature-card-clean">
+                        <div class="feature-icon-box" style="background: var(--accent-sky-light); color: var(--accent-sky);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        </div>
+                        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Actionable Gap Analysis</h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                            Highlights exactly which keywords are missing from your resume so you can tailor your application before applying.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section id="workflow">
+                <div class="section-center-head">
+                    <span class="hero-pill-badge">WORKFLOW</span>
+                    <h2>How It Works</h2>
+                    <p>
+                        Three simple steps to optimize your resume and find matching jobs.
+                    </p>
+                </div>
+
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number-pill">1</div>
+                        <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Upload Your Resume</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                            Drop in your existing resume document. Our parser extracts all technical keywords and detects your career domain.
+                        </p>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number-pill">2</div>
+                        <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Review ATS Analysis</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                            Inspect your ATS alignment score, see verified skills, and review specific keyword recommendations.
+                        </p>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number-pill">3</div>
+                        <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Match Top Jobs</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                            Compare your profile against open job postings or sync Gmail alerts to monitor matching roles automatically.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom CTA Banner -->
+            <section class="cta-banner-clean">
+                <h2>Ready to Supercharge Your Job Search?</h2>
+                <p>Join candidates using AI-driven ATS evaluation to stand out to recruiters and land interviews faster.</p>
+                <div>
+                    <a href="#demo" class="btn-saas-secondary" style="padding: 0.85rem 2rem; font-size: 1rem; border-radius: var(--radius-full);">
+                        Get Started Free &rarr;
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="saas-container" style="padding-top: 0; padding-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                <div style="text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                        <span style="color: var(--teal-600); font-weight: 800;">✦</span>
+                        <strong style="color: var(--text-primary); font-family: 'Outfit', sans-serif;">ResumeAI Candidate Matching Platform</strong>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                        Natural Language Processing &bull; Scikit-Learn TF-IDF Cosine Matcher &bull; PyMuPDF Resume Parser &bull; Gmail API
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1.5rem; font-size: 0.88rem;">
+                    <a href="#" style="color: var(--text-muted); text-decoration: none;">Privacy Policy</a>
+                    <a href="#" style="color: var(--text-muted); text-decoration: none;">Terms of Service</a>
+                    <a href="#" style="color: var(--text-muted); text-decoration: none;">API Documentation</a>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); text-align: center; font-size: 0.8rem; color: var(--text-light);">
+                &copy; 2026 ResumeAI. All rights reserved. Built with modern web standards and responsive CSS.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Simulator Script & Mobile Nav -->
+    <script>
+        // Mobile Drawer Toggle
+        const mobileToggle = document.getElementById('mobile-nav-toggle');
+        const mobileDrawer = document.getElementById('mobile-nav-drawer');
+        if (mobileToggle && mobileDrawer) {
+            mobileToggle.addEventListener('click', () => {
+                mobileDrawer.classList.toggle('open');
+            });
+        }
+
+        // Simulator Skill Database
+        const SKILLS = {
+            web_development: ["django", "react", "javascript", "bootstrap", "html", "css", "postgresql", "rest apis"],
+            python_development: ["python", "django", "flask", "api", "backend", "sql", "docker", "redis"],
+            machine_learning: ["python", "machine learning", "deep learning", "tensorflow", "pytorch", "nlp", "scikit-learn"],
+            data_analyst: ["python", "sql", "data analysis", "pandas", "excel", "power bi", "tableau", "statistics"]
+        };
+
+        function updateSimDomain() {
+            const domain = document.getElementById("sim-domain").value;
+            const skills = SKILLS[domain];
+            const container = document.getElementById("sim-skills-list");
+            container.innerHTML = "";
+            
+            skills.forEach((skill, index) => {
+                const tag = document.createElement("span");
+                tag.className = "interactive-tag";
+                // Pre-select first 3 skills to mirror the screenshots
+                if (index < 3) {
+                    tag.classList.add("active");
+                }
+                tag.innerText = skill;
+                tag.onclick = function() {
+                    tag.classList.toggle("active");
+                };
+                container.appendChild(tag);
+            });
+
+            document.getElementById("sim-result").style.display = "none";
+            document.getElementById("sim-loader").style.display = "none";
+            document.getElementById("sim-initial-placeholder").style.display = "block";
+        }
+
+        function triggerSimulatorScan() {
+            document.getElementById("sim-initial-placeholder").style.display = "none";
+            document.getElementById("sim-result").style.display = "none";
+            document.getElementById("sim-loader").style.display = "block";
+            
+            setTimeout(() => {
+                document.getElementById("sim-loader").style.display = "none";
+                calculateSimScore();
+            }, 600);
+        }
+
+        function calculateSimScore() {
+            const domain = document.getElementById("sim-domain").value;
+            const totalSkills = SKILLS[domain];
+            const container = document.getElementById("sim-skills-list");
+            const activeTags = container.getElementsByClassName("interactive-tag active");
+            const selectedSkills = Array.from(activeTags).map(t => t.innerText);
+            
+            const matchedCount = selectedSkills.length;
+            const ratio = matchedCount / totalSkills.length;
+            const score = Math.round(ratio * 100);
+            
+            document.getElementById("sim-result").style.display = "block";
+            document.getElementById("sim-score-text").innerText = score + "%";
+            
+            const verdict = document.getElementById("sim-score-verdict");
+            const desc = document.getElementById("sim-score-desc");
+            
+            if (score >= 70) {
+                verdict.innerText = "High Compatibility ✓";
+                verdict.style.color = "var(--primary-700)";
+                desc.innerText = "Strong skill coverage for standard job requisitions in this career path.";
+            } else if (score >= 40) {
+                verdict.innerText = "Moderate Match ⚡";
+                verdict.style.color = "var(--accent-amber-dark)";
+                desc.innerText = "Good foundation. Adding missing target keywords will improve recruiter discovery.";
+            } else {
+                verdict.innerText = "Skill Gaps Identified ⚠️";
+                verdict.style.color = "var(--accent-rose-dark)";
+                desc.innerText = "Consider adding key technical skills to increase ATS pass-through rate.";
+            }
+
+            // Populate Missing Skills
+            const missingContainer = document.getElementById("sim-missing-skills");
+            missingContainer.innerHTML = "";
+            const missing = totalSkills.filter(s => !selectedSkills.includes(s));
+            
+            if (missing.length === 0) {
+                missingContainer.innerHTML = '<span style="color: var(--primary-700); font-weight: 600; font-size: 0.85rem;">All track skills accounted for!</span>';
+            } else {
+                missing.forEach(s => {
+                    const chip = document.createElement("span");
+                    chip.className = "chip-skill-missing";
+                    chip.innerText = "+ " + s;
+                    missingContainer.appendChild(chip);
+                });
+            }
+        }
+
+        // Initialize on DOM load
+        document.addEventListener("DOMContentLoaded", function() {
+            updateSimDomain();
+        });
+    </script>
+</body>
+</html>
