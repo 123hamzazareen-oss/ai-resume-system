@@ -2,11 +2,17 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+def _contains_word(pattern_word, text):
+    if not pattern_word or not text:
+        return False
+    escaped = re.escape(pattern_word)
+    return bool(re.search(r'(?<![a-zA-Z0-9])' + escaped + r'(?![a-zA-Z0-9])', text))
+
 class MatchEngine:
     def __init__(self, resume_text, skills, domain):
         self.resume_text = (resume_text or "").lower()
-        self.skills = [s.lower().strip() for s in skills]
-        self.domain = domain.lower()
+        self.skills = [s.lower().strip() for s in (skills or []) if s]
+        self.domain = (domain or "").lower()
         self.vectorizer = TfidfVectorizer(
             stop_words="english",
             ngram_range=(1, 2),
@@ -53,13 +59,16 @@ class MatchEngine:
                 "business intelligence"
             ]
         }
-    def clean_text(self, text):
-        text = text.lower()
-        text = re.sub(r"[^a-z0-9+#. ]", " ", text)
 
+    def clean_text(self, text):
+        text = (text or "").lower()
+        text = re.sub(r"[^a-z0-9+#. ]", " ", text)
         return text
 
     def compute_score(self, job_text):
+        if not job_text:
+            return 0, []
+
         job_text = self.clean_text(job_text)
         try:
             vectors = self.vectorizer.fit_transform([
@@ -71,7 +80,6 @@ class MatchEngine:
                 vectors[1:2]
             )[0][0]
             text_score = similarity * 100
-
         except Exception:
             text_score = 0
 
@@ -79,14 +87,13 @@ class MatchEngine:
         matched_count = 0
 
         for skill in self.skills:
-            if skill in job_text:
+            if _contains_word(skill, job_text):
                 matched_skills.append(skill)
                 matched_count += 1
 
         # percentage of skills matched
         if len(self.skills) > 0:
             skill_ratio = matched_count / len(self.skills)
-
         else:
             skill_ratio = 0
 
@@ -100,7 +107,7 @@ class MatchEngine:
         matched_keywords = 0
 
         for keyword in domain_keywords:
-            if keyword in job_text:
+            if _contains_word(keyword, job_text):
                 matched_keywords += 1
 
         domain_score = min(matched_keywords * 6, 25)
@@ -133,7 +140,7 @@ class MatchEngine:
         }
 
         for role in important_roles.get(self.domain, []):
-            if role in job_text:
+            if _contains_word(role, job_text):
                 role_bonus = 15
                 break
 

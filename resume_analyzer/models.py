@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -10,6 +11,12 @@ class Resume(models.Model):
     education = models.TextField(blank=True)
     experience = models.TextField(blank=True)
     ats_score = models.FloatField(default=0)
+
+    @property
+    def filename(self):
+        if self.file and self.file.name:
+            return os.path.basename(self.file.name)
+        return "Resume"
 
     def __str__(self):
         return f"{self.user.username} Resume"

@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AI Resume &amp; Candidate Matching Platform{% endblock %}</title>
     
+    <meta name="color-scheme" content="light">
+    
     <!-- Google Fonts Multi-Font System -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Design System Stylesheet -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Design System Stylesheet (with cache-busting) -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v={% now 'U' %}">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -127,8 +129,14 @@
             {% for message in messages %}
                 <div class="alert-item {% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
                     <div style="display: flex; align-items: center; gap: 0.6rem;">
-                        <span>
-                            {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% else %}ℹ{% endif %}
+                        <span style="display: inline-flex; align-items: center;">
+                            {% if message.tags == 'success' %}
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            {% elif message.tags == 'error' %}
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                            {% else %}
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            {% endif %}
                         </span>
                         <span>{{ message }}</span>
                     </div>
@@ -149,7 +157,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
                 <div style="text-align: left;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-                        <span style="color: var(--teal-600); font-weight: 800;">✦</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--teal-600);"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                         <strong style="color: var(--text-primary); font-family: 'Outfit', sans-serif;">ResumeAI Candidate Matching Platform</strong>
                     </div>
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
@@ -169,7 +177,7 @@
         </div>
     </footer>
 
-    <!-- Mobile Navigation Toggle Script -->
+    <!-- Mobile Navigation Toggle Script & Cache Cleaner -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('mobile-nav-toggle');
@@ -177,6 +185,15 @@
             if (toggleBtn && drawer) {
                 toggleBtn.addEventListener('click', function() {
                     drawer.classList.toggle('open');
+                });
+            }
+
+            // Automatically clean up any stale service workers that may interfere with local development
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                    }
                 });
             }
         });

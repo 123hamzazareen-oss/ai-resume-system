@@ -951,13 +951,13 @@
                     
                     <div class="checklist-row">
                         <div class="checklist-item">
-                            <span>✓</span> PDF &amp; Word Support
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--teal-600);"><polyline points="20 6 9 17 4 12"/></svg> PDF &amp; Word Support
                         </div>
                         <div class="checklist-item">
-                            <span>✓</span> Instant ATS Scoring
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--teal-600);"><polyline points="20 6 9 17 4 12"/></svg> Instant ATS Scoring
                         </div>
                         <div class="checklist-item">
-                            <span>✓</span> 100% Free
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--teal-600);"><polyline points="20 6 9 17 4 12"/></svg> 100% Free
                         </div>
                     </div>
                 </div>
@@ -1234,7 +1234,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
                 <div style="text-align: left;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-                        <span style="color: var(--teal-600); font-weight: 800;">✦</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--teal-600);"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                         <strong style="color: var(--text-primary); font-family: 'Outfit', sans-serif;">ResumeAI Candidate Matching Platform</strong>
                     </div>
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
@@ -1326,15 +1326,15 @@
             const desc = document.getElementById("sim-score-desc");
             
             if (score >= 70) {
-                verdict.innerText = "High Compatibility ✓";
+                verdict.innerText = "High Compatibility — Strong Match";
                 verdict.style.color = "var(--primary-700)";
                 desc.innerText = "Strong skill coverage for standard job requisitions in this career path.";
             } else if (score >= 40) {
-                verdict.innerText = "Moderate Match ⚡";
+                verdict.innerText = "Moderate Match — Action Recommended";
                 verdict.style.color = "var(--accent-amber-dark)";
                 desc.innerText = "Good foundation. Adding missing target keywords will improve recruiter discovery.";
             } else {
-                verdict.innerText = "Skill Gaps Identified ⚠️";
+                verdict.innerText = "Skill Gaps Identified";
                 verdict.style.color = "var(--accent-rose-dark)";
                 desc.innerText = "Consider adding key technical skills to increase ATS pass-through rate.";
             }

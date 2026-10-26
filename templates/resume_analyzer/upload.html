@@ -23,7 +23,7 @@
             <div style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
                 <span style="font-size: 1.2rem;">📄</span>
                 <span style="color: var(--text-muted); white-space: nowrap;">Current resume:</span>
-                <strong style="color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ latest_resume.file.name|slice:"8:" }}</strong>
+                <strong style="color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ latest_resume.filename }}</strong>
             </div>
             <a href="/resume/result/" style="color: var(--teal-700); font-weight: 700; white-space: nowrap; font-size: 0.82rem; margin-left: 0.75rem;">
                 View Report &rarr;
@@ -80,7 +80,8 @@
 
             <!-- Submit Button -->
             <button type="submit" id="btn-submit-upload" class="btn-saas-primary" style="width: 100%; justify-content: center; margin-top: 1.5rem; padding: 0.85rem 1.5rem; font-size: 1rem;">
-                <span>⚡</span> Analyze Resume &rarr;
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Analyze Resume &rarr;
             </button>
         </form>
 
@@ -95,7 +96,8 @@
     <!-- ATS Tips Card -->
     <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-xs);">
         <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.45rem;">
-            <span style="color: var(--teal-600);">💡</span> Tips for Highest ATS Compatibility:
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="color: var(--teal-600);"><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><circle cx="12" cy="12" r="5"/></svg>
+            Tips for Highest ATS Compatibility:
         </h4>
         <ul style="margin: 0; padding-left: 1.25rem; color: var(--text-muted); font-size: 0.85rem; line-height: 1.6;">
             <li>Use clean, single-column formatting without nested graphic frames.</li>

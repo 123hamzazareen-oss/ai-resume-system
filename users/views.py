@@ -5,13 +5,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from django.utils.http import url_has_allowed_host_and_scheme
 from job_matcher.models import Job, MatchResult
 from resume_analyzer.models import Resume
 from resume_analyzer.utils import (
     detect_domain,
     calculate_ats_score,
     get_missing_skills,
-    generate_suggestions
+    generate_suggestions,
+    extract_skills
 )
 from users.services.match_engine import MatchEngine
 from .forms import RegisterForm, LoginForm
@@ -61,7 +63,7 @@ def dashboard(request):
         if latest_resume:
             skills = [s.strip() for s in latest_resume.skills.split(",") if s.strip()]
             domain = detect_domain(skills)
-            ats_score = latest_resume.ats_score if latest_resume.ats_score else calculate_ats_score(skills, domain)
+            ats_score = latest_resume.ats_score if latest_resume.ats_score is not None else calculate_ats_score(skills, domain)
             missing_skills = get_missing_skills(skills, domain)
             suggestions = generate_suggestions(skills, missing_skills, domain, ats_score)
 
@@ -90,7 +92,7 @@ def dashboard(request):
     )
     ats_score = request.session.get(
         'ats_score',
-        85
+        0
     )
     missing_skills = request.session.get(
         'missing_skills',
@@ -108,32 +110,47 @@ def dashboard(request):
     # GMAIL
     # ---------------------------------------------------
     if 'credentials' in request.session:
-        gmail_connected = True
-        creds = Credentials(
-            **request.session['credentials']
-        )
-        service = build(
-            'gmail',
-            'v1',
-            credentials=creds
-        )
+        gmail_messages = []
+        try:
+            creds = Credentials(
+                **request.session['credentials']
+            )
+            if creds.expired and creds.refresh_token:
+                try:
+                    from google.auth.transport.requests import Request
+                    creds.refresh(Request())
+                    request.session['credentials']['token'] = creds.token
+                    request.session.modified = True
+                except Exception:
+                    pass
 
-        # ---------------------------------------------------
-        # SEARCH QUERY
-        # ---------------------------------------------------
-        query = QUERY_MAP.get(
-            domain,
-            "job OR hiring"
-        )
-        results = service.users().messages().list(
-            userId='me',
-            q=query,
-            maxResults=30
-        ).execute()
-        messages = results.get(
-            'messages',
-            []
-        )
+            service = build(
+                'gmail',
+                'v1',
+                credentials=creds
+            )
+
+            # ---------------------------------------------------
+            # SEARCH QUERY
+            # ---------------------------------------------------
+            query = QUERY_MAP.get(
+                domain,
+                "job OR hiring"
+            )
+            results = service.users().messages().list(
+                userId='me',
+                q=query,
+                maxResults=30
+            ).execute()
+            gmail_messages = results.get(
+                'messages',
+                []
+            )
+            gmail_connected = True
+        except Exception as e:
+            print("Gmail API fetch error in dashboard:", e)
+            gmail_connected = False
+            gmail_messages = []
 
         # ---------------------------------------------------
         # AI MATCH ENGINE
@@ -147,7 +164,7 @@ def dashboard(request):
         # ---------------------------------------------------
         # PROCESS EMAILS
         # ---------------------------------------------------
-        for msg in messages:
+        for msg in gmail_messages:
             try:
                 msg_data = service.users().messages().get(
                     userId='me',
@@ -416,8 +433,8 @@ def dashboard(request):
         target_desc = request.POST.get('target_job_description', '').strip()
         selected_job_id = request.POST.get('selected_job_id', '').strip()
 
-        if selected_job_id:
-            db_job = Job.objects.filter(id=selected_job_id).first()
+        if selected_job_id and selected_job_id.isdigit():
+            db_job = Job.objects.filter(id=int(selected_job_id)).first()
             if db_job:
                 target_title = db_job.title
                 target_desc = db_job.description
@@ -426,7 +443,8 @@ def dashboard(request):
             engine = MatchEngine(resume_text, skills, domain)
             score, matched_skills_target = engine.compute_score(target_desc)
             level = get_match_level(score)
-            missing_for_target = list(set(skills) - set(matched_skills_target))
+            target_job_skills = extract_skills(target_desc)
+            missing_for_target = [s for s in target_job_skills if s.lower() not in [user_s.lower() for user_s in skills]]
             custom_match_result = {
                 'title': target_title or 'Custom Target Position',
                 'description': target_desc,
@@ -517,6 +535,12 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 next_url = request.GET.get('next', 'dashboard')
+                if not url_has_allowed_host_and_scheme(
+                    url=next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure()
+                ):
+                    next_url = 'dashboard'
                 return redirect(next_url)
             else:
                 form.add_error(None, "Invalid username/email or password.")

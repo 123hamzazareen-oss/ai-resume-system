@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 import dotenv
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
@@ -10,7 +9,10 @@ dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-key')
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 't')
-ALLOWED_HOSTS = []
+
+if DEBUG:
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+ALLOWED_HOSTS = ['*'] if DEBUG else [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if h.strip()]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

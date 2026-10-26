@@ -67,6 +67,7 @@ class RegisterForm(forms.ModelForm):
         username_base = re.sub(r'[^a-zA-Z0-9_.-]', '', username_base)
         if not username_base:
             username_base = "user"
+        username_base = username_base[:140]
             
         username = username_base
         counter = 1

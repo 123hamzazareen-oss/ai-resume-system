@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -19,6 +20,7 @@ def upload_resume(request):
         form = ResumeUploadForm(request.POST, request.FILES)
 
         if form.is_valid():
+            resume = None
             try:
                 resume = form.save(commit=False)
                 resume.user = request.user
@@ -27,6 +29,12 @@ def upload_resume(request):
                 text = extract_text(file_path)
 
                 if not text or len(text.strip()) < 20:
+                    if resume.file and os.path.exists(resume.file.path):
+                        try:
+                            os.remove(resume.file.path)
+                        except OSError:
+                            pass
+                    resume.delete()
                     return render(request, 'resume_analyzer/upload.html', {
                         'form': form,
                         'error': 'Unable to extract text from the uploaded resume. Please upload a clear PDF or Word (.docx) document.'
@@ -55,11 +63,18 @@ def upload_resume(request):
                 request.session['suggestions'] = suggestions
                 request.session['resume_id'] = resume.id
 
-                messages.success(request, f"Resume '{resume.file.name.split('/')[-1]}' parsed and analyzed successfully!")
+                messages.success(request, f"Resume '{resume.filename}' parsed and analyzed successfully!")
                 return redirect('resume_result')
 
             except Exception as e:
                 print("ERROR:", e)
+                if resume and resume.pk:
+                    if resume.file and os.path.exists(resume.file.path):
+                        try:
+                            os.remove(resume.file.path)
+                        except OSError:
+                            pass
+                    resume.delete()
 
                 return render(request, 'resume_analyzer/upload.html', {
                     'form': form,

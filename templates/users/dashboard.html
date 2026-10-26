@@ -27,7 +27,7 @@
                     <span class="dash-active-pulse"></span>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     <span style="opacity: 0.75; font-size: 0.8rem;">Active:</span>
-                    <strong style="color: #ffffff; font-family: 'Space Grotesk', sans-serif;">{{ active_resume.file.name|slice:"8:"|truncatechars:18 }}</strong>
+                    <strong style="color: #ffffff; font-family: 'Space Grotesk', sans-serif;">{{ active_resume.filename|truncatechars:18 }}</strong>
                 </div>
             {% endif %}
 
@@ -472,7 +472,7 @@
                                         {% if '.pdf' in r.file.name|lower %}PDF{% else %}DOC{% endif %}
                                     </div>
                                     <div>
-                                        <strong style="color: #0f172a; font-size: 0.95rem; font-family: 'Sora', sans-serif;">{{ r.file.name|slice:"8:" }}</strong>
+                                        <strong style="color: #0f172a; font-size: 0.95rem; font-family: 'Sora', sans-serif;">{{ r.filename }}</strong>
                                         {% if forloop.first %}
                                             <span style="font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); font-weight: 700; margin-left: 0.4rem;">ACTIVE</span>
                                         {% endif %}

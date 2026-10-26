@@ -15,7 +15,7 @@
                 Resume ATS Analysis Report
             </h1>
             <p class="page-subtitle" style="font-size: 0.98rem; font-family: 'Plus Jakarta Sans', sans-serif;">
-                {% if resume %}Document: <strong style="color: #0f172a; font-family: 'Sora', sans-serif;">{{ resume.file.name|slice:"8:" }}</strong> &bull; {% endif %}
+                {% if resume %}Document: <strong style="color: #0f172a; font-family: 'Sora', sans-serif;">{{ resume.filename }}</strong> &bull; {% endif %}
                 Detected Track: <strong style="color: #0f766e; font-family: 'Space Grotesk', sans-serif;">{{ domain_display }}</strong>
             </p>
         </div>
